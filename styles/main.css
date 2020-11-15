@@ -44,7 +44,8 @@ nav{
     flex-direction: row;
     flex-wrap: wrap;
     list-style-type: none;
-    padding: 3%;
+    /*padding: 3%;*/
+    padding: 0;
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
@@ -54,14 +55,24 @@ nav ul {
     list-style-type: none;
     flex: 2;
     margin: 0px;
-}
-
-nav form {
-    flex: 1;
+    padding: 0;
+    overflow: hidden;
 }
 
 nav ul li {
     flex: 1;
+    display: flex;
+    height: 5rem;
+    text-align: right;
+    align-items: center;
+    justify-content: center;
+}
+
+nav ul li:hover {
+    flex: 1;
+    height: 5rem;
+    text-align: center;
+    background-color: grey;
 }
 
 nav a {
@@ -70,10 +81,26 @@ nav a {
     text-transform: uppercase;
 }
 
+nav a:hover {
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
 nav input[type=submit] {
     color: white;
     background-color: black;
 }
+
+#game1 {
+    background-color: grey;
+}
+
+#game1:hover {
+    background-color: darkgray;
+    color: white;
+}
+
+
 
 /*Page Layout*/
 div {
@@ -110,13 +137,28 @@ h1 {
 
 /*Matchup Button*/
 button {
-    background-color: lightsalmon;
+    background-color: #ffa07a;
     width: 50rem;
     height: 20rem;
     font-size: xx-large;
 }
 
+button:hover {
+    background-color: grey;
+}
+
 /*Steps list*/
 main ol {
     margin-bottom: 2rem;
+}
+
+/*Leaderboard*/
+aside ul li {
+    list-style-type: none;
+    padding: 1rem;
+    text-align: justify;
+}
+
+aside h2 {
+    text-align: center;
 }
