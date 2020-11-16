@@ -116,7 +116,26 @@ button {
     font-size: xx-large;
 }
 
+
 /*Steps list*/
 main ol {
     margin-bottom: 2rem;
+}
+
+
+.centre_screen{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+}
+
+
+.register_input{
+    width: 50;
+    height: 40;
+    margin-top: auto;
+    margin-bottom: auto;
 }
