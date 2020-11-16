@@ -1,0 +1,39 @@
+body{
+    color: black;
+    font-family: Tahoma, Verdana, Segoe, sans-serif;
+}
+
+.profile{
+    background-color: cornsilk;
+    text-align: center;
+}
+
+#username{
+    display: block;
+}
+
+.generalInfo{
+    padding-left: 10%;
+    text-align: left;
+}
+
+.generalInfo > h3{
+    padding-left: 15%;
+    text-decoration: wavy;
+}
+
+#recordBtn{
+    font-size: large;
+    background-color: #e7e7e7; 
+    color: black;
+}
+
+.record{
+    padding-left: 30%;
+}
+
+
+footer{
+    text-align: right;
+}
+
