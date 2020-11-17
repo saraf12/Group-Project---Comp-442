@@ -1,10 +1,11 @@
 body{
     color: black;
     font-family: Tahoma, Verdana, Segoe, sans-serif;
+    background-color: lightgray;
 }
 
 .profile{
-    background-color: cornsilk;
+    background-color: #24abbd;
     text-align: center;
     align-content: center;
     padding-top: 2%;
@@ -25,9 +26,9 @@ body{
     text-decoration: wavy;
 }
 
-#recordBtn{
+button{
     font-size: large;
-    background-color: #e7e7e7; 
+    background-color: lightsalmon;
     color: black;
 }
 
