@@ -25,6 +25,7 @@ function showRecord(){
 
 function submitRecord(){
     //What do we want the submit button to do
+    
 }
 
 function editProfile(){
