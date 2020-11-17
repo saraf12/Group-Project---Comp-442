@@ -1,13 +1,15 @@
 window.addEventListener("DOMContentLoaded", function() {
     let recordBtn = document.getElementById("recordBtn");
+    recordBtn.addEventListener("click", showRecord);
 
     let submitBtn = document.getElementsByName("submitRecord");
     var len = submitBtn.length;
     for(var i = 0; i < len; i++){
         submitBtn[i].addEventListener("click", submitRecord);
     }
-	
-    recordBtn.addEventListener("click", showRecord);
+    
+    let iconBtn = document.getElementById("profileIcons");
+    iconBtn.addEventListener("click", editProfile);
 });
 
 function showRecord(){
@@ -22,5 +24,11 @@ function showRecord(){
 }
 
 function submitRecord(){
-    
+    //What do we want the submit button to do
 }
+
+function editProfile(){
+    let newWin = window.open("about:blank", "hello", "width=200,height=200");
+    newWin.document.write("Hello, world!");
+}
+
