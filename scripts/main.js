@@ -5,6 +5,7 @@ window.addEventListener("DOMContentLoaded", function() {
 });
 
 function getMatch(){
-   
+    let pendingMatch = window.open("about:", "matchup", "width=00,height=200");
+    pendingMatch.document.write("Hello, world!");
 }
 
