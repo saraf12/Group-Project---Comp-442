@@ -114,6 +114,26 @@ div input[type=submit] {
     color: white;
 }
 
+/* Title/Profile Icon bar */
+/* #title-profile {
+    flex-direction: row;
+    justify-content: space-around;
+} */
+
+#profile {
+    position: absolute;
+    align-content: right;
+    border: black;
+    width: 50px; 
+    height: 50px;
+    right: 20px;
+    padding: 1rem;
+}
+
+#profile:hover {
+  background-color: #ffa07a;
+}
+
 
 
 /*Page Layout*/
