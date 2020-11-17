@@ -111,9 +111,10 @@ h1 {
 /*Matchup Button*/
 button {
     background-color: lightsalmon;
-    width: 50rem;
+    /*width: 50rem;
     height: 20rem;
-    font-size: xx-large;
+    */
+    text-align: center;
 }
 
 
@@ -136,6 +137,34 @@ main ol {
 .register_input{
     width: 50;
     height: 40;
-    margin-top: auto;
-    margin-bottom: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.button1{
+    width: 50rem;
+    height: 20rem;
+    font-size: xx-large;
+}
+
+.button2{
+    width: 150px;
+    height: 20px;
+    background-color: white;
+    color: black;
+    border: 2px solid #4CAF50;
+    padding: 32px 16px;
+    font-size: large;
+}
+
+.button3{
+    width: 150px;
+    height: 40px;
+}
+
+img.resize{
+    width:200px;
+    height:200px;
 }
