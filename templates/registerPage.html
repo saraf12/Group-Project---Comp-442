@@ -6,13 +6,24 @@
     </head>
 
     <body>
+        <div class="container">
+            {% for message in get_flashed_messages() %}
+            <div class="alert alert-warning">
+                <button type="button" class="close" data-dismiss="alert">
+                    &times;
+                </button>
+                {{message}}
+            </div>
+            {% endfor %}
+        </div>
+
         <div class = "centre_screen">
             <img src = "../static/images/user.png" class = "resize"></img>
             <button type = "button" class = "button button3" value = "Edit">
                 Edit Profile Picture
             </button>
 
-        <!-- <form action = "http://localhost:5000/register/" method = "POST"> -->
+        <form action = "http://localhost:5000/register/" method = "POST">
         <div>
             <label for = "Username"> Username: </label> 
             <input class = "register_input" type = "text" id = "username" name = "username"><br><br>
@@ -34,9 +45,10 @@
         </div>
 
         <div>
-            <button class = "button button3" formmethod="post" type = "button"> Submit </button>
+            <button class = "button button3" type="submit" formmethod="post"> Submit </button>
+            
         </div>
-        <!-- </form> -->
+        </form>
 
         </div>
     </body>
