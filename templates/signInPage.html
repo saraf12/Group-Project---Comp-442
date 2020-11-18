@@ -6,6 +6,7 @@
     </head>
 
     <body>
+        <form action = "http://localhost:5000/signin/" method = "POST">
         <div class = "centre_screen">
             <div>
             <label for = "Username"> Username: </label> 
@@ -17,8 +18,9 @@
             <input class = "register_input" type = "password" id = "password" name = "password"><br><br>
         </div>
 
-        <button type = "button" class = "button button3" value = "Submit"> Submit </button>
+        <button class = "button button3" type="submit" formmethod="post"> Submit </button>
 
         </div>
+        </form>
     </body>
 </html>

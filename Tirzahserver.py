@@ -36,8 +36,7 @@ c.execute('''
             CREATE TABLE Users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT,
-                fname TEXT,
-                lname TEXT,
+                name TEXT,
                 email TEXT,
                 passwordhash TEXT,
                 performanceRating INTEGER,
@@ -72,16 +71,6 @@ def check_password(pwd, b64ph, pep):
     # let passlib check the hash
     return bcrypt_sha256.verify(pwd, h)
 
-# @app.route("/register/", methods=['POST'])
-# def post_register():
-#     #Get all data from the from
-#     data = dict()
-#     fields = ["username", "name","email", "password"]
-#     for field in fields:
-#         data[field] = request.form.get(field)
-#     session["email"] = data["email"]
-#     return redirect(url_for("get_register"))
-
 @app.route("/register/", methods=["GET"])
 def get_register():
     return render_template("registerPage.html")
@@ -95,7 +84,7 @@ def post_register():
     regdb = get_db()
     c = get_db().cursor()
     data = dict()
-    fields = ['name', 'username', 'email', 'password', 'confirm-password']
+    fields = ['username', 'name', 'email', 'password', 'confirm-password']
     for field in fields:
         data[field] = request.form.get(field)
     valid = True
@@ -111,15 +100,32 @@ def post_register():
         flash("password and confirm password must match")
     if valid:
         session['email'] = data['email']
-    uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
-    #if a user is found, then this email address is taken
-    if uid is not None:
-        flash("An account with this email already exists")
+        uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
+        #if a user is found, then this email address is taken
+        if uid is not None:
+            flash("An account with this email already exists")
+            return redirect(url_for("get_register"))
+        # otherwise add them to the database and redirect to login
+        h = hash_password(data['password'], pep)
+        c.execute('INSERT INTO Users (username, name, email, passwordhash) VALUES (?,?,?,?);', 
+            (data['username'], data['name'], data['email'], h))
+        regdb.commit()
+        return redirect(url_for("get_signin"))
+    else:
         return redirect(url_for("get_register"))
-    # otherwise add them to the database and redirect to login
-    h = hash_password(data['password'], pep)
-    c.execute('INSERT INTO Users (email, passwordhash) VALUES (?,?);', (data['email'], h))
-    regdb.commit()
-    return redirect(url_for("get_signin"))
 
+
+@app.route("/signin/", methods=["POST"])
+def post_signin():
+    signindb = get_db()
+    c = get_db().cursor()
+    username = request.form.get('username')
+    password = hash_password(request.form.get('password'), pep)
+    print(password)
+    uid = c.execute('SELECT id FROM Users WHERE username=?;',(username,)).fetchone()
+    savedhash = c.execute('SELECT passwordhash FROM Users WHERE id=?;',(uid,)).fetchone()
+    if uid is not None and password == savedhash:
+        session['uid'] = uid
+        return f"{uid}"
+    return f"User doesn't exist"
     
