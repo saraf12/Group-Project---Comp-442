@@ -60,4 +60,4 @@ def post_register():
 
 @app.route("/register/", methods=["GET"])
 def get_register():
-    return render_template("signInPage.html")
+    return render_template("registerPage.html")
