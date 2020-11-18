@@ -9,7 +9,7 @@ app.config["SECRET_KEY"] = "correcthorsebatterystaple"
 def post_register():
     # first get all the data from the form
     data = dict()
-    fields = ["email", "password","Cpassword"]
+    fields = ["username","name","email", "password","confirm-password"]
     for field in fields:
         data[field] = request.form.get(field)
     # #next make sure the user submitted something for all required fields
@@ -21,25 +21,18 @@ def post_register():
     if valid and len(data["password"]) < 8:
         valid = False
         flash("Password must be at least 8 characters")
-    if valid and data["password"] != data["Cpassword"]:
+    if valid and data["password"] != data["confirm-password"]:
         valid = False
         flash("password and confirm password must match")
     #return accordingly
     if valid:
-        #session["email"] = request.form.get("email")
+        #report data back to SQL
         session["email"] = data["email"]
-        return redirect(url_for("index"))
+        return redirect(url_for("get_register"))
     else:
         return render_template("registerPage.html")
-        #return redirect(url_for("get_register"))
-
-
-# @app.route("/register/", methods=["POST"])
-# def get_Request():
-#     session["email"] = request.form.get("email")
-#     return redirect(url_for("index"))
 
 @app.route("/home/", methods=["GET"])
-def index():
-    email = session.get("email")
-    return f"Email: {email}"
+def get_register():
+    #email = session.get("email")
+    return render_template("mainPage.html")
