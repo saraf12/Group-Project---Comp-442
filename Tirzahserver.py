@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import base64
+import time
 from cryptography.fernet import Fernet
 from passlib.hash import bcrypt_sha256
 from flask import Flask, render_template, request, redirect, url_for, abort, session, flash, g
@@ -100,16 +101,25 @@ def post_register():
         flash("password and confirm password must match")
     if valid:
         session['email'] = data['email']
+        print("This is the email: " + str(data['email']))
         uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
+        print("This is the uid:" + str(uid))
         #if a user is found, then this email address is taken
         if uid is not None:
             flash("An account with this email already exists")
             return redirect(url_for("get_register"))
         # otherwise add them to the database and redirect to login
+        passtohash = data['password']
+        print(passtohash)
         h = hash_password(data['password'], pep)
+        print("This is val of pep in post_register:" + str(pep))
         c.execute('INSERT INTO Users (username, name, email, passwordhash) VALUES (?,?,?,?);', 
             (data['username'], data['name'], data['email'], h))
         regdb.commit()
+        uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
+        print("This is the uid after adding entry:" + str(uid))
+        savedhash = c.execute('SELECT passwordhash FROM Users WHERE id=?;',(uid[0],)).fetchone()
+        print(savedhash)
         return redirect(url_for("get_signin"))
     else:
         return redirect(url_for("get_register"))
@@ -119,13 +129,34 @@ def post_register():
 def post_signin():
     signindb = get_db()
     c = get_db().cursor()
-    username = request.form.get('username')
-    password = hash_password(request.form.get('password'), pep)
-    print(password)
-    uid = c.execute('SELECT id FROM Users WHERE username=?;',(username,)).fetchone()
-    savedhash = c.execute('SELECT passwordhash FROM Users WHERE id=?;',(uid,)).fetchone()
-    if uid is not None and password == savedhash:
-        session['uid'] = uid
-        return f"{uid}"
-    return f"User doesn't exist"
+    try: 
+        username = request.form.get('username')
+        passwordtxt = request.form.get('password')
+        # print("This is the value of pep in post_signin:" + str(pep))
+        # print(passwordtxt)
+        # password = hash_password(passwordtxt, pep)
+        # print(password)
+        uid = c.execute('SELECT id FROM Users WHERE username=?;',(username,)).fetchone()
+        savedhash = c.execute('SELECT passwordhash FROM Users WHERE id=?;',(uid[0],)).fetchone()
+        # print(savedhash)
+        if uid is not None and savedhash is not None: 
+            if check_password(passwordtxt, savedhash[0], pep):
+                session['uid'] = uid
+                session['expires'] = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+                # return f"{uid}"
+                return redirect(url_for("main_page"))
+            else:
+                flash("Password is incorrect")
+                return redirect(url_for("get_signin"))
+    except Exception:
+        flash("User does not exist")
+        return redirect(url_for("get_signin"))
+
+@app.route("/mainpage/", methods=["GET"])
+def main_page():
+    return render_template("mainPage.html")
+
+@app.route("/profilepage/", methods=["GET"])
+def profile_page():
+    return render_template("profilePage.html")
     
