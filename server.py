@@ -48,6 +48,16 @@ c.execute('''
 
 conn.commit()
 
+@app.route("/register/", methods=['POST'])
+def post_register():
+    #Get all data from the from
+    data = dict()
+    fields = ["username", "name","email", "password"]
+    for field in fields:
+        data[field] = request.form.get(field)
+    session["email"] = data["email"]
+    return redirect(url_for("get_register"))
+
 @app.route("/register/", methods=["GET"])
 def get_register():
-    return render_template("registerPage.html")
+    return render_template("signInPage.html")
