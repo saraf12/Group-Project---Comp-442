@@ -81,6 +81,7 @@ h1 {
     background-color: #24abbd;
     border: none;
     font-size: medium;
+    outline: none;
 }
 
 #nav-bar ul li:hover .game-btn{
