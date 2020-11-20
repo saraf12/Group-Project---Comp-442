@@ -42,10 +42,10 @@ c.execute('''
                 name TEXT,
                 email TEXT,
                 passwordhash TEXT,
-                performanceRating INTEGER,
-                wins INTEGER,
-                losses INTEGER,
-                totGamesPlayed INTEGER,
+                performanceRating INTEGER DEFAULT 0,
+                wins INTEGER DEFAULT 0,
+                losses INTEGER DEFAULT 0,
+                totGamesPlayed INTEGER DEFAULT 0,
                 icon TEXT
             );
             ''')
@@ -83,8 +83,10 @@ def check_password(pwd, b64ph, pep):
 def get_register():
     return render_template("registerPage.html")
 
+@app.route("/")
 @app.route("/signin/", methods=["GET"])
 def get_signin():
+    session['uid'] = ""
     return render_template("signInPage.html")
 
 @app.route("/register/", methods=["POST"])
@@ -169,9 +171,13 @@ def post_signin():
         print_exc()
         return redirect(url_for("get_signin"))
 
+
 @app.route("/mainpage/", methods=["GET"])
 def main_page():
     curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
     # print(curr_uid)
 
     # Code attempting to implement a time frame until user is logged out
@@ -211,14 +217,20 @@ def main_page():
 @app.route("/profilepage/", methods=["GET"])
 def profile_page():
     curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
     # print(curr_uid)
     regdb = get_db()
     c = get_db().cursor()
     profileData = dict()
     profileData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
-    print(profileData['name'])
     profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['performanceRating'] = c.execute('SELECT performanceRating FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['wins'] = c.execute('SELECT wins FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['losses'] = c.execute('SELECT losses FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['totGamesPlayed'] = c.execute('SELECT totGamesPlayed FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     return render_template("profilePage.html", profileData=profileData)
 
@@ -226,6 +238,9 @@ def profile_page():
 def get_edit_profile_page():
      # get info to prefill fields
     curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
     regdb = get_db()
     c = get_db().cursor()
     profileData = dict()
@@ -290,4 +305,5 @@ def post_edit_profile_page():
 @app.route("/matchup/", methods=["GET"])
 def matchup_window():
     return render_template("matchup.html")
+
     
