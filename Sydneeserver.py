@@ -88,7 +88,7 @@ def post_register():
     regdb = get_db()
     c = get_db().cursor()
     data = dict()
-    fields = ['username', 'name', 'email', 'password', 'confirm-password']
+    fields = ['Iprofile','username', 'name', 'email', 'password', 'confirm-password']
     for field in fields:
         data[field] = request.form.get(field)
     valid = True
@@ -116,8 +116,8 @@ def post_register():
         print(passtohash)
         h = hash_password(data['password'], pep)
         print("This is val of pep in post_register:" + str(pep))
-        c.execute('INSERT INTO Users (username, name, email, passwordhash) VALUES (?,?,?,?);', 
-            (data['username'], data['name'], data['email'], h))
+        c.execute('INSERT INTO Users (username, name, email, passwordhash,iconLink) VALUES (?,?,?,?,?);', 
+            (data['username'], data['name'], data['email'], h, data['Iprofile']))
         regdb.commit()
         uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
         print("This is the uid after adding entry:" + str(uid))
