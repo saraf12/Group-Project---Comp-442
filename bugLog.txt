@@ -1,1 +1,3 @@
 Bug: Matchup button resulting in a 404 error. Resolved. Medium priority. Date reported: 11/20/2020. Submitted by Tirzah Lloyd.
+Bug: Button for changing profile image not working. Resolved. Medium priority. Date reported: 11/18/20. Submitted by Sydnee Charles
+Bug: Button and profile image distortion in size. Resolved. Low priority. Date reported: 11/19/20. Submitted by Sydnee Charles
