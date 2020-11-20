@@ -1,8 +1,10 @@
 window.addEventListener("DOMContentLoaded", function() {
-    let requestBtn = document.getElementById("match-btn");
-	
-    requestBtn.addEventListener("click", getMatch);
-
+    let requestBtn = document.getElementsByClassName("match-btn");
+    var len = requestBtn.length;
+    for(var i = 0; i < len; i++){
+        requestBtn[i].addEventListener("click", getMatch);
+    }
+    
     let game1btn = document.getElementById("game1");
     game1btn.addEventListener("click", selectGame1);
     let game2btn = document.getElementById("game2");
@@ -15,7 +17,9 @@ window.addEventListener("DOMContentLoaded", function() {
 });
 
 function getMatch(){
-    popupWindow = window.open("/matchup/", "matchup", "width=500,height=500");
+    //popupWindow = window.open("/matchup/", "matchup", "width=500,height=500");
+    popupWindow = window.open("matchup.html","matchup","width=300,height=200");
+ 
 }
 
 function selectGame1(){
@@ -35,6 +39,15 @@ function selectGame1(){
     g4li.style.backgroundColor = "#24abbd";
     let g4btn = document.getElementById("g4btn");
     g4btn.style.backgroundColor = "#24abbd";
+
+    let g1 = document.getElementById("Tab1");
+    g1.style.display = "inline";
+    let g2 = document.getElementById("Tab2");
+    g2.style.display = "none";
+    let g3 = document.getElementById("Tab3");
+    g3.style.display = "none";
+    let g4 = document.getElementById("Tab4");
+    g4.style.display = "none";
 }
 
 function selectGame2(){
@@ -54,6 +67,16 @@ function selectGame2(){
     g4li.style.backgroundColor = "#24abbd";
     let g4btn = document.getElementById("g4btn");
     g4btn.style.backgroundColor = "#24abbd";
+
+
+    let g1 = document.getElementById("Tab1");
+    g1.style.display = "none";
+    let g2 = document.getElementById("Tab2");
+    g2.style.display = "inline";
+    let g3 = document.getElementById("Tab3");
+    g3.style.display = "none";
+    let g4 = document.getElementById("Tab4");
+    g4.style.display = "none";
 }
 
 function selectGame3(){
@@ -73,6 +96,16 @@ function selectGame3(){
     g4li.style.backgroundColor = "#24abbd";
     let g4btn = document.getElementById("g4btn");
     g4btn.style.backgroundColor = "#24abbd";
+
+
+    let g1 = document.getElementById("Tab1");
+    g1.style.display = "none";
+    let g2 = document.getElementById("Tab2");
+    g2.style.display = "none";
+    let g3 = document.getElementById("Tab3");
+    g3.style.display = "inline";
+    let g4 = document.getElementById("Tab4");
+    g4.style.display = "none";
 }
 
 function selectGame4(){
@@ -92,4 +125,14 @@ function selectGame4(){
     g4li.style.backgroundColor = "grey";
     let g4btn = document.getElementById("g4btn");
     g4btn.style.backgroundColor = "grey";
+
+
+    let g1 = document.getElementById("Tab1");
+    g1.style.display = "none";
+    let g2 = document.getElementById("Tab2");
+    g2.style.display = "none";
+    let g3 = document.getElementById("Tab3");
+    g3.style.display = "none";
+    let g4 = document.getElementById("Tab4");
+    g4.style.display = "inline";
 }

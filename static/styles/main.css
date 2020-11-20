@@ -171,7 +171,7 @@ h1 {
 
 
 /*Matchup Button*/
-#match-btn {
+.match-btn {
     background-color: #ffa07a;
     width: 50rem;
     height: 20rem;
