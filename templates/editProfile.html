@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <title> Sign - In </title>
+        <link rel="stylesheet" type="text/css" href="../static/styles/register.css"/>
+    </head>
+
+    <body>
+        <div class="container">
+            {% for message in get_flashed_messages() %}
+            <div class="alert alert-warning">
+                <button type="button" class="close" data-dismiss="alert">
+                    &times;
+                </button>
+                {{message}}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class = "centre_screen">
+            <img src = "../static/images/user.png" class = "resize"></img>
+            <button type = "button" class = "button button3" value = "Edit">
+                Edit Profile Picture
+            </button>
+
+        <form action = "http://localhost:5000/register/" method = "POST">
+        <div>
+            <label for = "Username"> Username: </label> 
+            <input class = "register_input" type = "text" id = "username" name = "username"><br><br>
+        </div>
+
+        <div>
+            <label for = "Name"> Name: </label> 
+            <input class = "register_input" type = "text" id = "name" name = "name"><br><br>
+        </div>
+
+        <div>
+            <label for = "Email"> Email: </label> 
+            <input class = "register_input" type = "text" id = "email" name = "email"><br><br>
+        </div>
+
+        <div>
+            <label for = "Password"> Password: </label> 
+            <input class = "register_input" type = "password" id = "password" name = "password"><br><br>
+        </div>
+
+        <div>
+            <label for = "Confirm-Password"> Confirm Password: </label> 
+            <input class = "register_input" type = "password" 
+                id = "confirm-password" name = "confirm-password"><br><br>
+        </div>
+
+        <div>
+            <button class = "button button3" type="submit" formmethod="post"> Submit </button>
+            
+        </div>
+        </form>
+
+        </div>
+
+        <footer>
+            <a href="/mainpage/">Return to Main page</a>
+        </footer>
+    </body>
+</html>
