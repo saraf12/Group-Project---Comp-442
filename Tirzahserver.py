@@ -30,9 +30,9 @@ conn = sqlite3.connect(dbpath)
 
 c = conn.cursor()
 
-c.execute('''
-            DROP TABLE IF EXISTS Users;
-            ''')
+# c.execute('''
+#             DROP TABLE IF EXISTS Users;
+#             ''')
 
 c.execute('''
             CREATE TABLE IF NOT EXISTS Users (
@@ -45,15 +45,18 @@ c.execute('''
                 wins INTEGER,
                 losses INTEGER,
                 totGamesPlayed INTEGER,
-                iconLink TEXT
+                icon TEXT
             );
             ''')
 
 conn.commit()
 
-#save this key somewhere outside the database!
-key = Fernet.generate_key()
-pep = Fernet(key)
+serverdir = os.path.dirname(__file__)
+pepfile = os.path.join(serverdir, "pepper.bin")
+with open(pepfile, 'rb') as fin:
+    key = fin.read()
+    pep = Fernet(key)
+
 
 #hash a password (pwd) and user pepper (pep)
 def hash_password(pwd, pep):
@@ -88,7 +91,7 @@ def post_register():
     regdb = get_db()
     c = get_db().cursor()
     data = dict()
-    fields = ['username', 'name', 'email', 'password', 'confirm-password']
+    fields = ['username', 'name', 'email', 'password', 'confirm-password', 'Iprofile']
     for field in fields:
         data[field] = request.form.get(field)
     valid = True
@@ -104,25 +107,31 @@ def post_register():
         flash("password and confirm password must match")
     if valid:
         session['email'] = data['email']
-        print("This is the email: " + str(data['email']))
+        # print("This is the email: " + str(data['email']))
         uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
-        print("This is the uid:" + str(uid))
-        #if a user is found, then this email address is taken
+        # print("This is the uid:" + str(uid))
+        # if a user is found, then this email address is taken
         if uid is not None:
             flash("An account with this email already exists")
             return redirect(url_for("get_register"))
+        uid = c.execute('SELECT id FROM Users WHERE username=?;',(data['username'],)).fetchone()
+        # print("This is the uid:" + str(uid))
+        # if a user is found, then this email address is taken
+        if uid is not None:
+            flash("An account with this username already exists")
+            return redirect(url_for("get_register"))
         # otherwise add them to the database and redirect to login
         passtohash = data['password']
-        print(passtohash)
+        # print(passtohash)
         h = hash_password(data['password'], pep)
-        print("This is val of pep in post_register:" + str(pep))
-        c.execute('INSERT INTO Users (username, name, email, passwordhash) VALUES (?,?,?,?);', 
-            (data['username'], data['name'], data['email'], h))
+        # print("This is val of pep in post_register:" + str(pep))
+        c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
+            (data['username'], data['name'], data['email'], h, data['Iprofile']))
         regdb.commit()
         uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
-        print("This is the uid after adding entry:" + str(uid))
+        # print("This is the uid after adding entry:" + str(uid))
         savedhash = c.execute('SELECT passwordhash FROM Users WHERE id=?;',(uid[0],)).fetchone()
-        print(savedhash)
+        # print(savedhash)
         return redirect(url_for("get_signin"))
     else:
         return redirect(url_for("get_register"))
@@ -136,15 +145,18 @@ def post_signin():
         username = request.form.get('username')
         passwordtxt = request.form.get('password')
         # print("This is the value of pep in post_signin:" + str(pep))
-        print(passwordtxt)
+        # print(passwordtxt)
         password = hash_password(passwordtxt, pep)
         # print(password)
         uid = c.execute('SELECT id FROM Users WHERE username=?;',(username,)).fetchone()
+        if uid is None:
+            flash("Username is not associated with an account")
+            return redirect(url_for("get_signin"))
         savedhash = c.execute('SELECT passwordhash FROM Users WHERE id=?;',(uid[0],)).fetchone()
         # print(savedhash)
         if uid is not None and savedhash is not None: 
             if check_password(passwordtxt, savedhash[0], pep):
-                session['uid'] = uid
+                session['uid'] = uid[0]
                 session['expires'] = time.strftime("%Y-%m-%dT%H:%M:%SZ")
                 # return f"{uid}"
                 return redirect(url_for("main_page"))
@@ -158,18 +170,64 @@ def post_signin():
 
 @app.route("/mainpage/", methods=["GET"])
 def main_page():
-    return render_template("mainPage.html")
+    curr_uid = session['uid']
+    print(curr_uid)
+    regdb = get_db()
+    c = get_db().cursor()
+    profileData = dict()
+    profileData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    # print(profileData['username'])
+    # print(profileData['name'])
+    # print(profileData['email'])
+    # print(profileData['icon'])
+    # THIS icon code  WORKS!!
+    # icon = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()
+    # icon = icon[0]
+
+    # profileData = dict()
+    # profilePieces = ['username', 'name', 'email', 'icon']       #need to add record stuff to this
+    # temp = c.execute('SELECT ? FROM Users WHERE id=?;',(profilePieces[0], curr_uid,)).fetchone()
+    # print(temp[0])
+    # for field in profilePieces:
+    #     holder = c.execute('SELECT ? FROM Users WHERE id=?;',(field, curr_uid,)).fetchone()
+    #     print(holder)
+
+    # print(profileData['icon'])
+    return render_template("mainPage.html", profileData=profileData)
 
 @app.route("/profilepage/", methods=["GET"])
 def profile_page():
-    return render_template("profilePage.html")
+    curr_uid = session['uid']
+    # print(curr_uid)
+    regdb = get_db()
+    c = get_db().cursor()
+    profileData = dict()
+    profileData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    return render_template("profilePage.html", profileData=profileData)
 
 @app.route("/editprofile/", methods=["GET"])
 def get_edit_profile_page():
-    return render_template("editProfile.html")
+     # get info to prefill fields
+    curr_uid = session['uid']
+    regdb = get_db()
+    c = get_db().cursor()
+    profileData = dict()
+    profileData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    print(profileData['name'])
+    profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    return render_template("editProfile.html", profileData=profileData)
 
 @app.route("/editprofile/", methods=["POST"])
 def post_edit_profile_page():
+    curr_uid = session['uid']
     regdb = get_db()
     c = get_db().cursor()
     data = dict()
@@ -184,7 +242,7 @@ def post_edit_profile_page():
         valid = False
         flash("password and confirm password must match")
     if valid:
-        session['email'] = data['email']
+        # session['email'] = data['email']
         #print("This is the email: " + str(data['email']))
         uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
        # print("This is the uid:" + str(uid))
@@ -192,20 +250,19 @@ def post_edit_profile_page():
         # otherwise add them to the database and redirect to login
         if data['password'] is not None:
             passtohash = data['password']
-            print(passtohash)
+            # print(passtohash)
             h = hash_password(data['password'], pep)
+            c.execute('INSERT INTO Users (passwordhash) VALUES(?) WHERE id=?;',
+            (h, curr_uid))
         #print("This is val of pep in post_register:" + str(pep))
         if data['username'] is not None:
-            c.execute('INSERT INTO Users (username) VALUES(?);',
-            (data['username']))
+            c.execute('INSERT INTO Users (username) VALUES(?) WHERE id=?;',
+            (data['username'], curr_uid))
         if data['name'] is not None:
-            c.execute('INSERT INTO Users (name) VALUES(?);',
-            (data['name']))
-        if h is not None:
-            c.execute('INSERT INTO Users (passwordhash) VALUES(?);',
-            (h))
+            c.execute('INSERT INTO Users (name) VALUES(?) WHERE id=?;',
+            (data['name'], curr_uid))
         regdb.commit()
-        uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
+        # uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
         # print("This is the uid after adding entry:" + str(uid))
         # savedhash = c.execute('SELECT passwordhash FROM Users WHERE id=?;',(uid[0],)).fetchone()
         # print(savedhash)

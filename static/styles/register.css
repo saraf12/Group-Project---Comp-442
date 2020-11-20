@@ -2,7 +2,7 @@
 body {
     background-color: lightgray;
     font-family: Tahoma, Verdana, Segoe, sans-serif;
-    
+    margin: 1rem;
 }
 
 .profile{
@@ -28,9 +28,24 @@ button {
 
 .Sbutton{
     font-size: larger;
+
 }
 
 img.resize{
     width:200px;
     height:200px;
+}
+
+#title {
+    font-size: xx-large;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    text-align: justify;
+}
+
+.returnbtn {
+    background-color: #24abbd;
+}
+
+#SbtnDiv {
+    text-align: center;
 }

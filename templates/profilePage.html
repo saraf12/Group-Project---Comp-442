@@ -10,13 +10,13 @@
         <!--Icons made by <a href="https://www.flaticon.com/authors/vitaly-gorbachev" 
             title="Vitaly Gorbachev">Vitaly Gorbachev</a> from <a href="https://www.flaticon.com/" 
             title="Flaticon"> www.flaticon.com</a> -->
-        <img src="../static/avatar/001-man.png" width="150px" height="150px" >
+        <img src="../static/userIcon/{{ profileData.icon }}" width="150px" height="150px" >
         <a href="../editprofile"><button id="profileIcons">Edit profile</button></a>
-        <h1 id="username">Username</h1>
+        <h1 id="username">{{ profileData.username }}</h1>
     </div>
 
     <div class="generalInfo">
-        <h2>Email: {unknow@.ccg.ude}</h2>
+        <h2>Email: {{ profileData.email }}</h2>
         <h2>Current Rating: {0000}</h2>
         <h3>Win: {0}   Loss: {0}</h3>
     </div>
