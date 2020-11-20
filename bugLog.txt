@@ -1,0 +1,1 @@
+Bug: Matchup button resulting in a 404 error. Resolved. Medium priority. Date reported: 11/20/2020. Submitted by Tirzah Lloyd.
