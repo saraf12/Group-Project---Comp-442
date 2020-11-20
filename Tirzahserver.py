@@ -257,7 +257,7 @@ def post_edit_profile_page():
     regdb = get_db()
     c = get_db().cursor()
     data = dict()
-    fields = ['username', 'name', 'email', 'password', 'confirm-password']
+    fields = ['username', 'name', 'email', 'password', 'confirm-password', 'Iprofile']
     for field in fields:
         data[field] = request.form.get(field)
     print(data['password'])
@@ -292,6 +292,9 @@ def post_edit_profile_page():
             c.execute('UPDATE Users SET name = ? WHERE id = ?;', (data['name'], curr_uid))
             # c.execute('INSERT INTO Users (name) VALUES(?) WHERE id=?;',
             # (data['name'], curr_uid))
+        currColor = c.execute('SELECT icon FROM Users WHERE id=?;',(curr_uid,)).fetchone()
+        if data['Iprofile'] != currColor:
+            c.execute('UPDATE Users SET icon = ? WHERE id = ?;', (data['Iprofile'], curr_uid))
         regdb.commit()
         # uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
         # print("This is the uid after adding entry:" + str(uid))
