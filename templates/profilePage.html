@@ -18,8 +18,8 @@
     <div class="generalInfo">
         <h2>Name: {{ profileData.name }}</h2>
         <h2>Email: {{ profileData.email }}</h2>
-        <h2>Current Rating: {0000}</h2>
-        <h3>Win: {0}   Loss: {0}</h3>
+        <h2>Current Rating: {{ profileData.performanceRating }}</h2>
+        <h3>Win: {{ profileData.wins }}   Loss: {{ profileData.losses }}</h3>
     </div>
 
     <div class="record">
