@@ -3,6 +3,7 @@
     <head>
         <title> Sign - In </title>
         <link rel="stylesheet" type="text/css" href="../static/styles/register.css"/>
+        <script src="../static/scripts/icon.js"></script>
     </head>
 
     <body>
@@ -18,12 +19,34 @@
         </div>
 
         <div class = "centre_screen">
-            <img src = "../static/images/user.png" class = "resize"></img>
+            <!-- <img src = "../static/images/user.png" class = "resize"></img>
             <button type = "button" class = "button button3" value = "Edit">
                 Edit Profile Picture
-            </button>
-
+            </button> -->
+            
         <form action = "http://localhost:5000/register/" method = "POST">
+            <div class="container">
+                <div>
+                    <img src="../static/userIcon/black.png" width="10%" height="10%" id="Uicon">
+                </div>
+                <div id="Ilist">
+                    <button class="icons" type="button" id="black" style=" background-color: black;"> </button>
+                    <button class="icons" type="button" id="Blue" style=" background-color: #0094FF;"> </button>
+                    <button class="icons" type="button" id="darkBlue" style=" background-color: #0026FF;"> </button>
+                    <button class="icons" type="button" id="gray" style=" background-color: #808080;"> </button>
+                    <button class="icons" type="button" id="green" style=" background-color: #4cff00;"> </button>
+                    <button class="icons" type="button" id="lightBlue" style=" background-color: #00FFFF;"> </button>
+                    <button class="icons" type="button" id="lightGreen" style=" background-color: #B6FF00;"> </button>
+                    <button class="icons" type="button" id="orange" style=" background-color: #FF6A00;"> </button>
+                    <button class="icons" type="button" id="pink" style=" background-color: #FF006E;"> </button>
+                    <button class="icons" type="button" id="purple" style=" background-color: #B200FF;"> </button>
+                    <button class="icons" type="button" id="red" style=" background-color: red;"> </button>
+                    <button class="icons" type="button" id="yellow" style=" background-color: #ffd800;"> </button>
+                    
+                    
+                </div>
+            </div>
+
         <div>
             <label for = "Username"> Username: </label> 
             <input class = "register_input" type = "text" id = "username" name = "username"><br><br>
@@ -51,7 +74,7 @@
         </div>
 
         <div>
-            <button class = "button button3" type="submit" formmethod="post"> Submit </button>
+            <button class = "Sbutton" type="submit" formmethod="post"> Submit </button>
             
         </div>
         </form>

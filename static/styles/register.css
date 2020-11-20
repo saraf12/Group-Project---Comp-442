@@ -1,228 +1,29 @@
-/*Color Properties*/
-#nav-bar {
-    background-color: #24abbd;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-}
 
 body {
     background-color: lightgray;
-}
-
-aside {
-    background-color: #24abbd;
-}
-
-main {
-    background-color: white;
-}
-
-footer {
-    background-color: white;
-}
-
-/*Font Properties */
-body {
     font-family: Tahoma, Verdana, Segoe, sans-serif;
-}
-
-h2, h3 {
-    font-family: "Brush Script MT", cursive;
-    font-weight: bolder;
-    font-size: 34pt;
-}
-
-h1 {
-    font-family: "Brush Script MT", cursive;
-}
-
-/*Nav Layout*/
-#nav-bar {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    list-style-type: none;
-    /*padding: 3%;*/
-    padding: 0;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-}
-
-#nav-bar ul {
-    display: flex;
-    list-style-type: none;
-    flex: 2;
-    margin: 0px;
-    padding: 0;
-    overflow: hidden;
-}
-
-#nav-bar ul li {
-    flex: 1;
-    display: flex;
-    height: 5rem;
-    text-align: right;
-    align-items: center;
-    justify-content: center;
-    background-color: #24abbd;
-}
-
-#nav-bar ul li:hover {
-    flex: 1;
-    /* height: 5rem; */
     text-align: center;
-    background-color: grey;
-
 }
 
-.game-btn {
-    background-color: #24abbd;
+.icons{
+    border-radius: 50%;
     border: none;
-    font-size: medium;
-}
-
-#nav-bar ul li:hover .game-btn{
-    background-color: grey;
-
-}
-
-
-/* div ul li button {
-    text-decoration: none;
-    color: black;
-    text-transform: uppercase;
-}
-
-div ul li button:hover {
-    text-decoration: none;
-    text-transform: uppercase;
-}
-
-div input[type=submit] {
     color: white;
-    background-color: black;
-} */
-
-#game1 {
-    background-color: grey;
-}
-
-#game1:hover {
-    background-color: darkgray;
-    color: white;
-}
-
-/* Title/Profile Icon bar */
-/* #title-profile {
-    flex-direction: row;
-    justify-content: space-around;
-} */
-
-#profile {
-    position: absolute;
-    align-content: right;
-    border: black;
-    width: 50px; 
-    height: 50px;
-    right: 20px;
-    padding: 1rem;
-}
-
-#profile:hover {
-  background-color: #ffa07a;
-}
-
-
-
-/*Page Layout*/
-div {
-    display: flex;
-}
-
-div aside {
-    flex: 1;
-    margin: 10;
-    margin-right: 1rem;
-    padding: 1rem;
-}
-
-div main {
-    flex: 2;
-    margin: 10;
-    padding: 1rem;
-}
-
-footer {
-    padding: 20;
-    margin: 10;
-    margin-top: 0;
-}
-
-
-/*Header*/
-h1 {
+    padding: 20px;
     text-align: center;
-    font-size: 50pt;
-    margin-bottom: 0;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 4px 2px;
 }
 
-
-/*Matchup Button*/
 button {
     background-color: lightsalmon;
-    /*width: 50rem;
-    height: 20rem;
-    */
     text-align: center;
 }
 
-
-/*Steps list*/
-main ol {
-    margin-bottom: 2rem;
-}
-
-
-.centre_screen{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-height: 100vh;
-}
-
-
-.register_input{
-    width: 50;
-    height: 40;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-.button1{
-    width: 50rem;
-    height: 20rem;
-    font-size: xx-large;
-}
-
-.button2{
-    width: 150px;
-    height: 20px;
-    background-color: white;
-    color: black;
-    border: 2px solid #4CAF50;
-    padding: 32px 16px;
-    font-size: large;
-}
-
-.button3{
-    width: 150px;
-    height: 40px;
+.Sbutton{
+    font-size: larger;
 }
 
 img.resize{

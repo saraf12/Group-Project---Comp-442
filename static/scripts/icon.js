@@ -1,6 +1,5 @@
 window.addEventListener("DOMContentLoaded", function() {
-    let list = document.getElementById("Ilist");
-
+   
     let iconsBtn = document.getElementsByClassName("icons");
     var len = iconsBtn.length;
     
