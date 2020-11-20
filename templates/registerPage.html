@@ -2,6 +2,12 @@
 <html lang="">
     <head>
         <title> Sign - In </title>
+        <!-- Bootstraps -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <!--  -->
         <link rel="stylesheet" type="text/css" href="../static/styles/register.css"/>
         <script src="../static/scripts/icon.js"></script>
     </head>
@@ -18,16 +24,12 @@
             {% endfor %}
         </div>
 
-        <div class = "centre_screen">
-            <!-- <img src = "../static/images/user.png" class = "resize"></img>
-            <button type = "button" class = "button button3" value = "Edit">
-                Edit Profile Picture
-            </button> -->
-            
+        <div class = "m-4 form-group row">            
         <form action = "http://localhost:5000/register/" method = "POST">
-            <div class="container">
+            <div class="profile">
                 <div>
-                    <img src="../static/userIcon/black.png" width="10%" height="10%" id="Uicon">
+                    <img src="../static/userIcon/black.png" width="20%" height="20%" id="Uicon">
+                    <input type="hidden" name="Iprofile" id="Iprofile" value="black.png">
                 </div>
                 <div id="Ilist">
                     <button class="icons" type="button" id="black" style=" background-color: black;"> </button>
@@ -47,37 +49,37 @@
                 </div>
             </div>
 
-        <div>
-            <label for = "Username"> Username: </label> 
-            <input class = "register_input" type = "text" id = "username" name = "username"><br><br>
+        <div class="col-xs-2">
+            <label for = "f-username"> Username: </label> 
+            <input class = "form-control" type = "text" id = "username" name = "username"><br><br>
         </div>
 
-        <div>
-            <label for = "Name"> Name: </label> 
-            <input class = "register_input" type = "text" id = "name" name = "name"><br><br>
+        <div  class="col-xs-2">
+            <label for = "f-name"> Name: </label> 
+            <input class = "form-control" type = "text" id = "name" name = "name"><br><br>
         </div>
 
-        <div>
-            <label for = "Email"> Email: </label> 
-            <input class = "register_input" type = "text" id = "email" name = "email"><br><br>
+        <div  class="col-xs-2">
+            <label for = "f-email"> Email: </label> 
+            <input class = "form-control" type = "text" id = "email" name = "email"><br><br>
         </div>
 
-        <div>
-            <label for = "Password"> Password: </label> 
-            <input class = "register_input" type = "password" id = "password" name = "password"><br><br>
+        <div  class="col-xs-2">
+            <label for = "f-password"> Password: </label> 
+            <input class = "form-control" type = "password" id = "password" name = "password"><br><br>
         </div>
 
-        <div>
+        <div  class="col-xs-2">
             <label for = "Confirm-Password"> Confirm Password: </label> 
-            <input class = "register_input" type = "password" 
+            <input class = "form-control" type = "password" 
                 id = "confirm-password" name = "confirm-password"><br><br>
         </div>
 
-        <div>
+        <div  class="col-xs-2">
             <button class = "Sbutton" type="submit" formmethod="post"> Submit </button>
             
         </div>
-        </form>
+        
 
         </div>
     </body>
