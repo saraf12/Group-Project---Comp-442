@@ -50,6 +50,16 @@ c.execute('''
             );
             ''')
 
+c.execute('''
+            CREATE TABLE IF NOT EXISTS Matches (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username1 TEXT,
+                username2 TEXT,
+                winner TEXT,
+                loser TEXT,
+            );
+            ''')
+
 conn.commit()
 
 serverdir = os.path.dirname(__file__)
