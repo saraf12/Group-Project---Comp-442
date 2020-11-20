@@ -17,8 +17,8 @@ window.addEventListener("DOMContentLoaded", function() {
 });
 
 function getMatch(){
-    //popupWindow = window.open("/matchup/", "matchup", "width=500,height=500");
-    popupWindow = window.open("matchup.html","matchup","width=300,height=200");
+    popupWindow = window.open("/matchup/", "matchup", "width=500,height=500");
+    // popupWindow = window.open("matchup.html","matchup","width=300,height=200");
  
 }
 
