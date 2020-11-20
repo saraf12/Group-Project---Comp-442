@@ -28,8 +28,8 @@ function submitRecord(){
     
 }
 
-function editProfile(){
-    let newWin = window.open("../templates/mainPage.html", "hello", "width=200,height=200");
-    //newWin.document.write("Hello, world!");
-}
+// function editProfile(){
+//     let newWin = window.open("../templates/mainPage.html", "hello", "width=200,height=200");
+//     //newWin.document.write("Hello, world!");
+// }
 

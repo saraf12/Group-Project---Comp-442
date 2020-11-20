@@ -15,7 +15,7 @@ window.addEventListener("DOMContentLoaded", function() {
 });
 
 function getMatch(){
-    popupWindow = window.open("../templates/matchup.html", "matchup", "width=500,height=500");
+    popupWindow = window.open("/matchup/", "matchup", "width=500,height=500");
 }
 
 function selectGame1(){
