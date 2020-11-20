@@ -2,6 +2,7 @@ import sqlite3
 import os
 import base64
 import time
+import datetime
 from traceback import print_exc
 from cryptography.fernet import Fernet
 from passlib.hash import bcrypt_sha256
@@ -170,8 +171,17 @@ def post_signin():
 
 @app.route("/mainpage/", methods=["GET"])
 def main_page():
-    curr_uid = session['uid']
-    print(curr_uid)
+    curr_uid = session.get("uid")
+    # print(curr_uid)
+
+    # Code attempting to implement a time frame until user is logged out
+    # try:
+    #     exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    # except ValueError:
+    #     exp = None
+    # if uid is None or exp is None or exp < datetime.utcnow():
+    #     return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
     profileData = dict()
@@ -200,13 +210,14 @@ def main_page():
 
 @app.route("/profilepage/", methods=["GET"])
 def profile_page():
-    curr_uid = session['uid']
+    curr_uid = session.get("uid")
     # print(curr_uid)
     regdb = get_db()
     c = get_db().cursor()
     profileData = dict()
     profileData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    print(profileData['name'])
     profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     return render_template("profilePage.html", profileData=profileData)
@@ -214,7 +225,7 @@ def profile_page():
 @app.route("/editprofile/", methods=["GET"])
 def get_edit_profile_page():
      # get info to prefill fields
-    curr_uid = session['uid']
+    curr_uid = session.get("uid")
     regdb = get_db()
     c = get_db().cursor()
     profileData = dict()
@@ -227,17 +238,19 @@ def get_edit_profile_page():
 
 @app.route("/editprofile/", methods=["POST"])
 def post_edit_profile_page():
-    curr_uid = session['uid']
+    curr_uid = session.get("uid")
     regdb = get_db()
     c = get_db().cursor()
     data = dict()
     fields = ['username', 'name', 'email', 'password', 'confirm-password']
     for field in fields:
         data[field] = request.form.get(field)
+    print(data['password'])
     valid = True
-    if valid and data['password'] is not None and len(data['password']) < 8:
-        valid = False
-        flash("password must be at least 8 characters")
+    if valid and data['password'] != "":
+        if len(data['password']) < 8:
+            valid = False
+            flash("password must be at least 8 characters")
     if valid and data['password'] != data['confirm-password']:
         valid = False
         flash("password and confirm password must match")
@@ -248,27 +261,30 @@ def post_edit_profile_page():
        # print("This is the uid:" + str(uid))
         #if a user is found, then this email address is taken
         # otherwise add them to the database and redirect to login
-        if data['password'] is not None:
+        if data['password'] != "":
             passtohash = data['password']
             # print(passtohash)
             h = hash_password(data['password'], pep)
-            c.execute('INSERT INTO Users (passwordhash) VALUES(?) WHERE id=?;',
-            (h, curr_uid))
+            c.execute('UPDATE Users SET passwordhash = ? WHERE id = ?;', (h, curr_uid))
+            # c.execute('INSERT INTO Users (passwordhash) VALUES(?) WHERE id=?;',
+            # (h, curr_uid))
         #print("This is val of pep in post_register:" + str(pep))
-        if data['username'] is not None:
-            c.execute('INSERT INTO Users (username) VALUES(?) WHERE id=?;',
-            (data['username'], curr_uid))
-        if data['name'] is not None:
-            c.execute('INSERT INTO Users (name) VALUES(?) WHERE id=?;',
-            (data['name'], curr_uid))
+        if data['username'] != "":
+            c.execute('UPDATE Users SET username = ? WHERE id = ?;', (data['username'], curr_uid))
+            # c.execute('INSERT INTO Users (username) VALUES(?) WHERE id=?;',
+            # (data['username'], curr_uid))
+        if data['name'] != "":
+            c.execute('UPDATE Users SET name = ? WHERE id = ?;', (data['name'], curr_uid))
+            # c.execute('INSERT INTO Users (name) VALUES(?) WHERE id=?;',
+            # (data['name'], curr_uid))
         regdb.commit()
         # uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
         # print("This is the uid after adding entry:" + str(uid))
         # savedhash = c.execute('SELECT passwordhash FROM Users WHERE id=?;',(uid[0],)).fetchone()
         # print(savedhash)
-        return redirect(url_for("get_signin"))
+        return redirect(url_for("profile_page"))
     else:
-        return redirect(url_for("get_register"))
+        return redirect(url_for("get_edit_profile_page"))
 
 
 @app.route("/matchup/", methods=["GET"])

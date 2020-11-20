@@ -1,0 +1,54 @@
+
+body {
+    background-color: lightgray;
+    font-family: Tahoma, Verdana, Segoe, sans-serif;
+    margin: 1rem;
+}
+
+.profile{
+    text-align: center;
+}
+
+.icons{
+    border-radius: 50%;
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 4px 2px;
+}
+
+button {
+    background-color: lightsalmon;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.Sbutton{
+    font-size: larger;
+
+}
+
+img.resize{
+    width:200px;
+    height:200px;
+}
+
+#title {
+    font-size: xx-large;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    text-align: justify;
+}
+
+.returnbtn {
+    background-color: #24abbd;
+}
+
+#createAccountLink {
+    padding: 1rem;
+    margin-top: 1rem;
+    font-size: small;
+}

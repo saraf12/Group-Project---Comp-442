@@ -2,7 +2,7 @@
 <html lang="">
     <head>
         <title>Sign - Up</title>
-        <link rel="stylesheet" type="text/css" href="../static/styles/register.css"/>
+        <link rel="stylesheet" type="text/css" href="../static/styles/signin.css"/>
     </head>
 
     <body>
@@ -16,6 +16,10 @@
                 {{message}}
             </div>
             {% endfor %}
+        </div>
+
+        <div>
+            <h2 id="title">Log In</h2>
         </div>
 
         <form action = "http://localhost:5000/signin/" method = "POST">
@@ -34,5 +38,10 @@
 
         </div>
         </form>
+
+        <footer>
+            <a id="createAccountLink" href="/register/">Don't have an account? Create one</a>
+        </footer>
+
     </body>
 </html>
