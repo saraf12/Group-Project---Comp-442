@@ -307,6 +307,18 @@ def post_edit_profile_page():
 
 @app.route("/matchup/", methods=["GET"])
 def matchup_window():
-    return render_template("matchup.html")
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
+    profileData = dict()
+    profileData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['performanceRating'] = c.execute('SELECT performanceRating FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    return render_template("matchup.html", profileData=profileData)
 
     
