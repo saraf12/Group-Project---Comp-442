@@ -56,7 +56,7 @@ c.execute('''
                 username1 TEXT,
                 username2 TEXT,
                 winner TEXT,
-                loser TEXT,
+                loser TEXT
             );
             ''')
 
@@ -205,6 +205,10 @@ def main_page():
     profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+
+    #Getting leaderboard stuff
+    UserList = c.execute('SELECT username, performanceRating FROM Users ORDER BY performanceRating DESC;').fetchall()
+    print(UserList[0][0])
     # print(profileData['username'])
     # print(profileData['name'])
     # print(profileData['email'])
@@ -222,7 +226,7 @@ def main_page():
     #     print(holder)
 
     # print(profileData['icon'])
-    return render_template("mainPage.html", profileData=profileData)
+    return render_template("mainPage.html", profileData=profileData, UserList=UserList)
 
 @app.route("/profilepage/", methods=["GET"])
 def profile_page():
@@ -316,19 +320,58 @@ def post_edit_profile_page():
 
 
 @app.route("/matchup/", methods=["GET"])
-def matchup_window():
+def get_matchup_window():
     curr_uid = session.get("uid")
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
     regdb = get_db()
     c = get_db().cursor()
-    profileData = dict()
-    profileData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
-    profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
-    profileData['performanceRating'] = c.execute('SELECT performanceRating FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
-    profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
-    profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
-    return render_template("matchup.html", profileData=profileData)
+    currUserData = dict()
+
+    currUserData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    currUserData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    currUserData['performanceRating'] = c.execute('SELECT performanceRating FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    currUserData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+    currUserData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+
+    lowerLimit = currUserData['performanceRating'] - 200
+    upperLimit = currUserData['performanceRating'] + 200
+
+    opponentData = c.execute('SELECT username, email, performanceRating FROM Users WHERE performanceRating >= ? AND performanceRating <= ? AND NOT id=? ORDER BY RANDOM() LIMIT 1;', 
+        (lowerLimit, upperLimit, curr_uid,)).fetchone()
+    # print(opponentData[0])
+    
+
+    return render_template("matchup.html", currUserData=currUserData, opponentData=opponentData)
+
+@app.route("/matchaccepted/", methods=["POST"])
+def post_matchup_window_accept():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
+    currentUsername = request.form.get('current-username')
+    opponentUsername = request.form.get('opponent-username')
+    c.execute('INSERT INTO Matches (username1, username2) VALUES (?,?);', 
+            (currentUsername, opponentUsername,))
+    regdb.commit()
+    return redirect(url_for("match_accepted"))
+
+@app.route("/matchdeclined/", methods=["POST"])
+def post_matchup_window_decline():
+    return redirect(url_for("main_page"))
+
+@app.route("/acceptconfirmation/", methods=["GET"])
+def match_accepted():
+    return render_template("acceptPage.html")
+
+@app.route("/declineconfirmation/", methods=["GET"])
+def match_declined():
+    return render_template("declinePage.html")
+
+
 
     

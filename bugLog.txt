@@ -1,4 +1,6 @@
 Bug: Matchup button resulting in a 404 error. Resolved. Medium priority. Date reported: 11/20/2020. Submitted by Tirzah Lloyd.
 Bug: Button for changing profile image not working. Resolved. Medium priority. Date reported: 11/18/20. Submitted by Sydnee Charles
 Bug: Button and profile image distortion in size. Resolved. Low priority. Date reported: 11/19/20. Submitted by Sydnee Charles
-Bug: Getting the popup windonw for the requested match to close itslef. Open. Medium priority. Date reported: 11/20/20. Submitted by Sydnee Charles
+Bug: Getting the popup windonw for the requested match to close itself. Open. Medium priority. Date reported: 11/20/20. Submitted by Sydnee Charles
+Bug: Columns for performanceRating, wins, and losses are not auto filling with zeros upon account creation. Open. Medium priority. Date reported: 11/20/2020. Submitted by Tirzah Lloyd.
+Bug: Log out link on opposite side of page from profile icon. Open. Low priority. Date reported/l 11/20/2020. Submitted by Tirzah Lloyd.
