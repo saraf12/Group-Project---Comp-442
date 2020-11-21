@@ -42,7 +42,7 @@ c.execute('''
                 name TEXT,
                 email TEXT,
                 passwordhash TEXT,
-                performanceRating INTEGER DEFAULT 0,
+                performanceRating INTEGER DEFAULT 400,
                 wins INTEGER DEFAULT 0,
                 losses INTEGER DEFAULT 0,
                 totGamesPlayed INTEGER DEFAULT 0,
@@ -138,8 +138,8 @@ def post_register():
         # print(passtohash)
         h = hash_password(data['password'], pep)
         # print("This is val of pep in post_register:" + str(pep))
-        c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
-            (data['username'], data['name'], data['email'], h, data['Iprofile']))
+        c.execute('INSERT INTO Users (username, name, email, passwordhash, performanceRating, wins, losses, icon) VALUES (?,?,?,?,?,?,?,?);', 
+            (data['username'], data['name'], data['email'], h, 400, 0, 0,data['Iprofile']))
         regdb.commit()
         uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
         # print("This is the uid after adding entry:" + str(uid))
