@@ -34,6 +34,22 @@ button{
 .record{
     padding-left: 30%;
 }
+#recordTable{
+    display: none; 
+    background-color:darkgray;
+    width: 23%; 
+    overflow: auto;
+    border: 1px solid black;
+}
+th{
+    text-align: bottom;
+    vertical-align: bottom;
+    margin-bottom: 0%;
+    border-top: 1px solid black;
+}
+td{
+    margin-top: 0%;
+}
 
 
 footer{

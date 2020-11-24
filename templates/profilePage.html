@@ -25,11 +25,17 @@
     <div class="record">
         <button id="recordBtn">Update Record</button>
         <div class="table">
-        <table id="recordTable" style="display: none; background-color:darkgray;
-        height: 200px; width: 25%; overflow: auto;">
+        <table id="recordTable">
         {% for match in records %}
             <tr>
-                <td><img src="../static/userIcon/{{match.icon}}" width="50px" height="50px"></td>
+                <th colspan="3">
+                    <p>{{match.username}}</p>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <img src="../static/userIcon/{{match.icon}}" width="50px" height="50px">
+                </td>
                 <td>
                     <input type="radio" name="result" >
                     <label>Win</label><br>
