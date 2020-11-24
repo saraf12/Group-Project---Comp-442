@@ -27,8 +27,9 @@
         <div class="table">
         <table id="recordTable" style="display: none; background-color:darkgray;
         height: 200px; width: 25%; overflow: auto;">
+        {% for match in records %}
             <tr>
-                <td><img src="../static/avatar/010-woman.png" width="50px" height="50px"></td>
+                <td><img src="../static/userIcon/{{match.icon}}" width="50px" height="50px"></td>
                 <td>
                     <input type="radio" name="result" >
                     <label>Win</label><br>
@@ -37,57 +38,7 @@
                 </td>
                 <td><button name="submitRecord">Submit</button></td>
             </tr>
-            <tr>
-                <td><img src="../static/avatar/010-woman.png" width="50px" height="50px"></td>
-                <td>
-                    <input type="radio" name="result" >
-                    <label>Win</label><br>
-                    <input type="radio" name="result">
-                    <label>Loss</label>
-                </td>
-                <td><button name="submitRecord">Submit</button></td>
-            </tr>
-            <tr>
-                <td><img src="../static/avatar/010-woman.png" width="50px" height="50px"></td>
-                <td>
-                    <input type="radio" name="result" >
-                    <label>Win</label><br>
-                    <input type="radio" name="result">
-                    <label>Loss</label>
-                </td>
-                <td><button name="submitRecord">Submit</button></td>
-            </tr>
-            <tr>
-                <td><img src="../static/avatar/010-woman.png" width="50px" height="50px"></td>
-                <td>
-                    <input type="radio" name="result" >
-                    <label>Win</label><br>
-                    <input type="radio" name="result">
-                    <label>Loss</label>
-                </td>
-                <td><button name="submitRecord">Submit</button></td>
-            </tr>
-            <tr>
-                <td><img src="../static/avatar/010-woman.png" width="50px" height="50px"></td>
-                <td>
-                    <input type="radio" name="result" >
-                    <label>Win</label><br>
-                    <input type="radio" name="result">
-                    <label>Loss</label>
-                </td>
-                <td><button name="submitRecord">Submit</button></td>
-            </tr>
-            <tr>
-                <td><img src="../static/avatar/010-woman.png" width="50px" height="50px"></td>
-                <td>
-                    <input type="radio" name="result" >
-                    <label>Win</label><br>
-                    <input type="radio" name="result">
-                    <label>Loss</label>
-                </td>
-                <td><button name="submitRecord">Submit</button></td>
-            </tr>
-            
+        {% endfor %}
         </table>
     </div>
     </div>
