@@ -49,12 +49,16 @@ c.execute('''
                 icon TEXT
             );
             ''')
-
+#status value: ('Requested','Denied','OnGoing','Waiting','Completed','Conflicted')
 c.execute('''
             CREATE TABLE IF NOT EXISTS Matches (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username1 TEXT,
                 username2 TEXT,
+                status TEXT,
+                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+                response1 TEXT,
+                response2 TEXT,
                 winner TEXT,
                 loser TEXT
             );
@@ -375,8 +379,8 @@ def post_matchup_window_accept():
     c = get_db().cursor()
     currentUsername = request.form.get('current-username')
     opponentUsername = request.form.get('opponent-username')
-    c.execute('INSERT INTO Matches (username1, username2) VALUES (?,?);', 
-            (currentUsername, opponentUsername,))
+    c.execute('INSERT INTO Matches (username1, username2, status) VALUES (?,?,?);', 
+            (currentUsername, opponentUsername,'Requested',))
     regdb.commit()
     return redirect(url_for("match_accepted"))
 
