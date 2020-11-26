@@ -232,7 +232,7 @@ def main_page():
     # print(profileData['icon'])
     return render_template("mainPage.html", profileData=profileData, UserList=UserList)
 
-@app.route("/profilepage/", methods=["GET"])
+@app.route("/profilepage/", methods=["GET", "POST"])
 def profile_page():
     curr_uid = session.get("uid")
     if curr_uid == "":
@@ -257,19 +257,38 @@ def profile_page():
     recordList = []
     matchesId = c.execute('SELECT id FROM Matches WHERE username1 =? OR username2=? ',(profileData['username'],profileData['username'],)).fetchall()
     
-    for k in matchesId:
+    for mId in matchesId:
         match = dict()
-        username1 = c.execute('SELECT username1 FROM Matches WHERE id = ?',(k,)).fetchone()
-        username2 = c.execute('SELECT username2 FROM Matches WHERE id = ?', (k,)).fetchone()
+        match["id"] = mId
+        match['c_username'] = profileData['username']
+        username1 = c.execute('SELECT username1 FROM Matches WHERE id = ?',(mId,)).fetchone()
+        username2 = c.execute('SELECT username2 FROM Matches WHERE id = ?', (mId,)).fetchone()
         if(username1 == profileData['username']):
+            match['user'] = 1
             match['username'] = username2
             match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username2,)).fetchone()
         else:
+            match['user'] = 2
             match['username'] = username1
             match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username1,)).fetchone()
-                
+              
         recordList.append(match)
-
+   
+    #Update records
+    matchId = request.form['matchId']
+    r = request.form.getlist('result')
+    user = request.form['user']
+    regdb = get_db()
+    c = get_db().cursor()
+    if r:
+        result = r[0]
+        if(user == 1):
+            c.execute('UPDATE Matches SET response1 =? WHERE id =?;',(result, matchId))
+        else:
+            c.execute('UPDATE Matches SET response2 =? WHERE id =?;',(result, matchId))
+    regdb.commit()
+    
+    # return f"{matchId}"
     return render_template("profilePage.html", profileData=profileData, records = recordList)
 
 @app.route("/editprofile/", methods=["GET"])
@@ -396,5 +415,19 @@ def match_accepted():
 def match_declined():
     return render_template("declinePage.html")
 
-
+# @app.route("/profilepage/", methods=["POST"])
+# def updaterecord():
+#     # matchId = request.form['matchId']
+#     # r = request.form.getlist('result')
+#     # user = request.form['user']
+#     regdb = get_db()
+#     c = get_db().cursor()
+#     c.execute('UPDATE Matches SET response1 =? WHERE id =?;',("Done", 1))
+#     # if r:
+#     #     result = r[0]
+#     #     if(user == 1):
+#     #         c.execute('UPDATE Matches SET response1 =? WHERE id =?;',(result, matchId))
+#     #     else:
+#     #         c.execute('UPDATE Matches SET response2 =? WHERE id =?;',(result, matchId))
+#     return f"Done"
     
