@@ -25,7 +25,24 @@ function showRecord(){
 
 function submitRecord(){
     //What do we want the submit button to do
-    
+    //this.disabled = true;
+    name = "result" + this.id;
+    let radioBtn = document.getElementsByName(name);
+    var len = radioBtn.length;
+    var x = 0;
+    for(var i = 0; i < len; i++){
+        if(radioBtn[i].checked == true){
+            x = 1;
+        }
+    }
+    if(x == 1){
+        this.display = "none";
+        for(var e = 0; e < len; e++){
+            radioBtn[e].disabled = true;
+        }
+    }
+        
+
 }
 
 // function editProfile(){
