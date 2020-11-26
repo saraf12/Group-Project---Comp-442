@@ -261,17 +261,24 @@ def profile_page():
         match = dict()
         match["id"] = mId
         match['c_username'] = profileData['username']
+        resp = ""
         username1 = c.execute('SELECT username1 FROM Matches WHERE id = ?',(mId,)).fetchone()
         username2 = c.execute('SELECT username2 FROM Matches WHERE id = ?', (mId,)).fetchone()
         if(username1 == profileData['username']):
             match['user'] = 1
             match['username'] = username2
             match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username2,)).fetchone()
+            resp = c.execute('SELECT response1 FROM Matches WHERE id=?',(mId,)).fetchone()
         else:
             match['user'] = 2
             match['username'] = username1
             match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username1,)).fetchone()
-              
+            resp = c.execute('SELECT response2 FROM Matches WHERE id=?',(mId,)).fetchone()
+
+        if(resp == None):
+            match['response'] = 0
+        else:
+            match['response'] = 1
         recordList.append(match)
    
     #Update records
@@ -419,18 +426,18 @@ def match_declined():
 def updaterecord():
     matchId = request.form['matchId']
     name = "result" + str(matchId)
-    r = request.form.getlist(name)
-    user = request.form['user']
+    r = request.form.getlist('result')
+    user = int(request.form['user'])
     regdb = get_db()
     c = get_db().cursor()
     c.execute('UPDATE Matches SET response1 =? WHERE id =?;',("Done", 1))
-    if r:
+    if len(r) > 0:
         result = r[0]
         if(user == 1):
             c.execute('UPDATE Matches SET response1 =? WHERE id =?;',(result, matchId))
         else:
             c.execute('UPDATE Matches SET response2 =? WHERE id =?;',(result, matchId))
-    
+    #print(len(r))
     regdb.commit()
     return redirect(url_for("profile_page"))
     
