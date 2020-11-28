@@ -60,6 +60,9 @@ c.execute('''
             );
             ''')
 
+c.execute('''
+            DELETE FROM Users where username="gamer500";''')
+
 conn.commit()
 
 serverdir = os.path.dirname(__file__)
@@ -246,7 +249,29 @@ def profile_page():
     profileData['losses'] = c.execute('SELECT losses FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['totGamesPlayed'] = c.execute('SELECT totGamesPlayed FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
-    return render_template("profilePage.html", profileData=profileData)
+
+    #Get records
+    regdb.row_factory = lambda cursor, row: row[0]
+    c = regdb.cursor()
+    recordList = []
+    matchesId = c.execute('SELECT id FROM Matches WHERE username1 =? OR username2=? ',(profileData['username'],profileData['username'],)).fetchall()
+    
+    for k in matchesId:
+        match = dict()
+        username1 = c.execute('SELECT username1 FROM Matches WHERE id = ?',(k,)).fetchone()
+        username2 = c.execute('SELECT username2 FROM Matches WHERE id = ?', (k,)).fetchone()
+        if(username1 == profileData['username']):
+            match['username'] = username2
+            match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username2,)).fetchone()
+        else:
+            match['username'] = username1
+            match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username1,)).fetchone()
+                
+        recordList.append(match)
+
+
+
+    return render_template("profilePage.html", profileData=profileData, records = recordList)
 
 @app.route("/editprofile/", methods=["GET"])
 def get_edit_profile_page():
