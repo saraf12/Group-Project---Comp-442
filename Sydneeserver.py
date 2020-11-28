@@ -49,12 +49,16 @@ c.execute('''
                 icon TEXT
             );
             ''')
-
+#status value: ('Requested','Denied','OnGoing','Waiting','Completed','Conflicted')
 c.execute('''
             CREATE TABLE IF NOT EXISTS Matches (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username1 TEXT,
                 username2 TEXT,
+                status TEXT,
+                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+                response1 TEXT,
+                response2 TEXT,
                 winner TEXT,
                 loser TEXT
             );
@@ -253,19 +257,45 @@ def profile_page():
     recordList = []
     matchesId = c.execute('SELECT id FROM Matches WHERE username1 =? OR username2=? ',(profileData['username'],profileData['username'],)).fetchall()
     
-    for k in matchesId:
+    for mId in matchesId:
         match = dict()
-        username1 = c.execute('SELECT username1 FROM Matches WHERE id = ?',(k,)).fetchone()
-        username2 = c.execute('SELECT username2 FROM Matches WHERE id = ?', (k,)).fetchone()
+        match["id"] = mId
+        match['c_username'] = profileData['username']
+        resp = ""
+        username1 = c.execute('SELECT username1 FROM Matches WHERE id = ?',(mId,)).fetchone()
+        username2 = c.execute('SELECT username2 FROM Matches WHERE id = ?', (mId,)).fetchone()
         if(username1 == profileData['username']):
+            match['user'] = 1
             match['username'] = username2
             match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username2,)).fetchone()
+            resp = c.execute('SELECT response1 FROM Matches WHERE id=?',(mId,)).fetchone()
         else:
+            match['user'] = 2
             match['username'] = username1
             match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username1,)).fetchone()
-                
-        recordList.append(match)
+            resp = c.execute('SELECT response2 FROM Matches WHERE id=?',(mId,)).fetchone()
 
+        if(resp == None):
+            match['response'] = 0
+        else:
+            match['response'] = 1
+        recordList.append(match)
+   
+    #Update records
+    #matchId = request.form['matchId']
+    #r = request.form.getlist('result')
+    # user = request.form['user']
+    # regdb = get_db()
+    # c = get_db().cursor()
+    # if len(r) > 0:
+    #     result = r[0]
+    #     if(user == 1):
+    #         c.execute('UPDATE Matches SET response1 =? WHERE id =?;',(result, matchId))
+    #     else:
+    #         c.execute('UPDATE Matches SET response2 =? WHERE id =?;',(result, matchId))
+    #regdb.commit()
+    
+    # return f"{matchId}"
     return render_template("profilePage.html", profileData=profileData, records = recordList)
 
 @app.route("/editprofile/", methods=["GET"])
@@ -375,8 +405,8 @@ def post_matchup_window_accept():
     c = get_db().cursor()
     currentUsername = request.form.get('current-username')
     opponentUsername = request.form.get('opponent-username')
-    c.execute('INSERT INTO Matches (username1, username2) VALUES (?,?);', 
-            (currentUsername, opponentUsername,))
+    c.execute('INSERT INTO Matches (username1, username2, status) VALUES (?,?,?);', 
+            (currentUsername, opponentUsername,'Requested',))
     regdb.commit()
     return redirect(url_for("match_accepted"))
 
@@ -392,5 +422,22 @@ def match_accepted():
 def match_declined():
     return render_template("declinePage.html")
 
-
+@app.route("/profilepage/", methods=["POST"])
+def updaterecord():
+    matchId = request.form['matchId']
+    name = "result" + str(matchId)
+    r = request.form.getlist('result')
+    user = int(request.form['user'])
+    regdb = get_db()
+    c = get_db().cursor()
+    c.execute('UPDATE Matches SET response1 =? WHERE id =?;',("Done", 1))
+    if len(r) > 0:
+        result = r[0]
+        if(user == 1):
+            c.execute('UPDATE Matches SET response1 =? WHERE id =?;',(result, matchId))
+        else:
+            c.execute('UPDATE Matches SET response2 =? WHERE id =?;',(result, matchId))
+    #print(len(r))
+    regdb.commit()
+    return redirect(url_for("profile_page"))
     
