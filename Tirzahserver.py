@@ -2,11 +2,11 @@ import sqlite3
 import os
 import base64
 import time
-import datetime
+from datetime import datetime, timedelta
 from traceback import print_exc
 from cryptography.fernet import Fernet
 from passlib.hash import bcrypt_sha256
-from flask import Flask, render_template, request, redirect, url_for, abort, session, flash, g
+from flask import Flask, render_template, request, redirect, url_for, abort, session, flash, g, jsonify, make_response
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config["SECRET_KEY"] = "correcthorsebatterystaple"
@@ -32,7 +32,7 @@ conn = sqlite3.connect(dbpath)
 c = conn.cursor()
 
 # c.execute('''
-#             DROP TABLE IF EXISTS Users;
+#             DROP TABLE IF EXISTS Stats;
 #             ''')
 
 c.execute('''
@@ -55,8 +55,14 @@ c.execute('''
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username1 TEXT,
                 username2 TEXT,
-                winner TEXT,
-                loser TEXT
+                response1 TEXT,
+                response2 TEXT,
+                status TEXT,
+                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+                FOREIGN KEY (username1) REFERENCES Users(username),
+                FOREIGN KEY (username2) REFERENCES Users(username),
+                FOREIGN KEY (winner) REFERENCES Users(username),
+                FOREIGN KEY (loser) REFERENCES Users(username)
             );
             ''')
 
@@ -64,6 +70,20 @@ c.execute('''
             CREATE TABLE IF NOT EXISTS Games (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT
+            );
+            ''')
+
+c.execute('''
+            CREATE TABLE IF NOT EXISTS Stats (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user TEXT,
+                game INTEGER,
+                performanceRating INTEGER DEFAULT 400,
+                wins INTEGER DEFAULT 0,
+                losses INTEGER DEFAULT 0,
+                totGamesPlayed INTEGER DEFAULT 0,
+                FOREIGN KEY (user) REFERENCES Users(username),
+                FOREIGN KEY (game) REFERENCES Games(id)
             );
             ''')
 conn.commit()
@@ -151,8 +171,8 @@ def post_register():
         # print(passtohash)
         h = hash_password(data['password'], pep)
         # print("This is val of pep in post_register:" + str(pep))
-        c.execute('INSERT INTO Users (username, name, email, passwordhash, performanceRating, wins, losses, icon) VALUES (?,?,?,?,?,?,?,?);', 
-            (data['username'], data['name'], data['email'], h, 400, 0, 0,data['Iprofile']))
+        c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
+            (data['username'], data['name'], data['email'], h, data['Iprofile']))
         regdb.commit()
         uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
         # print("This is the uid after adding entry:" + str(uid))
@@ -182,10 +202,11 @@ def post_signin():
         # print(savedhash)
         if uid is not None and savedhash is not None: 
             if check_password(passwordtxt, savedhash[0], pep):
+                expires = datetime.utcnow()+timedelta(minutes=30)
                 session['uid'] = uid[0]
-                session['expires'] = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+                session['expires'] = expires.strftime("%Y-%m-%dT%H:%M:%SZ")
                 # return f"{uid}"
-                return redirect(url_for("main_page"))
+                return redirect(url_for("get_main_page"))
             else:
                 flash("Password is incorrect")
                 return redirect(url_for("get_signin"))
@@ -196,7 +217,7 @@ def post_signin():
 
 
 @app.route("/mainpage/", methods=["GET"])
-def main_page():
+def get_main_page():
     curr_uid = session.get("uid")
     if curr_uid == "":
         flash("Please sign in")
@@ -204,12 +225,13 @@ def main_page():
     # print(curr_uid)
 
     # Code attempting to implement a time frame until user is logged out
-    # try:
-    #     exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
-    # except ValueError:
-    #     exp = None
-    # if uid is None or exp is None or exp < datetime.utcnow():
-    #     return redirect(url_for("get_signin"))
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
 
     regdb = get_db()
     c = get_db().cursor()
@@ -220,8 +242,9 @@ def main_page():
     profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
 
     #Getting leaderboard stuff
-    UserList = c.execute('SELECT username, performanceRating FROM Users ORDER BY performanceRating DESC;').fetchall()
-    print(UserList[0][0])
+    # UserList = "null"
+    # UserList = c.execute('SELECT username, performanceRating FROM Users ORDER BY performanceRating DESC;').fetchall()
+    # print(UserList[0][0])
     # print(profileData['username'])
     # print(profileData['name'])
     # print(profileData['email'])
@@ -240,14 +263,76 @@ def main_page():
 
     # print(profileData['icon'])
 
+    #Trying to get current game value
+    # print(request.form.get("game-menu"))
+
     #Getting all the possible games
     gameOptions = dict()
     gamesCursor = get_db().cursor()
     gamesCursor.execute('SELECT id, name FROM Games;')
     for game in gamesCursor:
         gameOptions[game[0]] = game
-    print(gameOptions)
-    return render_template("mainPage.html", profileData=profileData, UserList=UserList, gameOptions=gameOptions)
+
+    #Getting leaderboard info for each game
+    UserLists = dict()
+    for gm in gamesCursor:
+        UserLists[game[0]] = c.execute('SELECT user, performanceRating FROM Stats WHERE game=? ORDER BY performanceRating DESC;', (game,)).fetchall()
+
+    # print(gameOptions)
+    return render_template("mainPage.html", profileData=profileData, UserList=UserLists, gameOptions=gameOptions)
+
+# @app.route("/ajaxtest/", methods=["POST"])
+# def post_main_page():
+
+#     curr_uid = session.get("uid")
+#     if curr_uid == "":
+#         flash("Please sign in")
+#         return redirect(url_for("get_signin"))
+#     # print(curr_uid)
+
+#     # Code attempting to implement a time frame until user is logged out
+#     try:
+#         exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+#     except ValueError:
+#         exp = None
+#     if curr_uid is None or exp is None or exp < datetime.utcnow():
+#         flash("Session has expired. Please sign in again.")
+#         return redirect(url_for("get_signin"))
+
+#     regdb = get_db()
+#     c = get_db().cursor()
+#     profileData = dict()
+#     profileData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+#     profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+#     profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+#     profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
+
+#     #Getting leaderboard stuff
+#     UserList = c.execute('SELECT username, performanceRating FROM Users ORDER BY performanceRating DESC;').fetchall()
+
+#     print(UserList)
+#     #Getting all the possible games
+#     gameOptions = dict()
+#     gamesCursor = get_db().cursor()
+#     gamesCursor.execute('SELECT id, name FROM Games;')
+#     for game in gamesCursor:
+#         gameOptions[game[0]] = game
+#     # print(gameOptions)
+    
+
+#     req = request.get_json()
+
+#     session['currgameid'] = req.get('gameid')
+#     print("This is the session variable:")
+#     print(session['currgameid']) 
+
+#     print("trying to print current game id:")
+#     print(session['currgameid'])
+
+#     # res = make_response(jsonify({"message": "JSON recieved"}), 200)
+
+#     return render_template("declinePage.html")
+
 
 @app.route("/profilepage/", methods=["GET"])
 def profile_page():
@@ -268,28 +353,60 @@ def profile_page():
     profileData['totGamesPlayed'] = c.execute('SELECT totGamesPlayed FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
 
-    #Get records
+   #Get records
     regdb.row_factory = lambda cursor, row: row[0]
     c = regdb.cursor()
     recordList = []
     matchesId = c.execute('SELECT id FROM Matches WHERE username1 =? OR username2=? ',(profileData['username'],profileData['username'],)).fetchall()
     
-    for k in matchesId:
+    for mId in matchesId:
         match = dict()
-        username1 = c.execute('SELECT username1 FROM Matches WHERE id = ?',(k,)).fetchone()
-        username2 = c.execute('SELECT username2 FROM Matches WHERE id = ?', (k,)).fetchone()
+        match["id"] = mId
+        match['c_username'] = profileData['username']
+        resp = ""
+        username1 = c.execute('SELECT username1 FROM Matches WHERE id = ?',(mId,)).fetchone()
+        username2 = c.execute('SELECT username2 FROM Matches WHERE id = ?', (mId,)).fetchone()
         if(username1 == profileData['username']):
+            match['user'] = 1
             match['username'] = username2
             match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username2,)).fetchone()
+            resp = c.execute('SELECT response1 FROM Matches WHERE id=?',(mId,)).fetchone()
         else:
+            match['user'] = 2
             match['username'] = username1
             match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username1,)).fetchone()
-                
+            resp = c.execute('SELECT response2 FROM Matches WHERE id=?',(mId,)).fetchone()
+
+        if(resp == None):
+            match['response'] = 0
+        else:
+            match['response'] = 1
         recordList.append(match)
 
 
-
     return render_template("profilePage.html", profileData=profileData, records = recordList)
+
+
+
+@app.route("/profilepage/", methods=["POST"])
+def updaterecord():
+    matchId = request.form['matchId']
+    name = "result" + str(matchId)
+    r = request.form.getlist('result')
+    user = int(request.form['user'])
+    regdb = get_db()
+    c = get_db().cursor()
+    c.execute('UPDATE Matches SET response1 =? WHERE id =?;',("Done", 1))
+    if len(r) > 0:
+        result = r[0]
+        if(user == 1):
+            c.execute('UPDATE Matches SET response1 =? WHERE id =?;',(result, matchId))
+        else:
+            c.execute('UPDATE Matches SET response2 =? WHERE id =?;',(result, matchId))
+    #print(len(r))
+    regdb.commit()
+    return redirect(url_for("profile_page"))
+
 
 @app.route("/editprofile/", methods=["GET"])
 def get_edit_profile_page():
@@ -303,10 +420,11 @@ def get_edit_profile_page():
     profileData = dict()
     profileData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
-    print(profileData['name'])
+    # print(profileData['name'])
     profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     return render_template("editProfile.html", profileData=profileData)
+
 
 @app.route("/editprofile/", methods=["POST"])
 def post_edit_profile_page():
@@ -317,7 +435,7 @@ def post_edit_profile_page():
     fields = ['username', 'name', 'email', 'password', 'confirm-password', 'Iprofile']
     for field in fields:
         data[field] = request.form.get(field)
-    print(data['password'])
+    # print(data['password'])
     valid = True
     if valid and data['password'] != "":
         if len(data['password']) < 8:

@@ -40,14 +40,26 @@
       </nav> -->
 
       <!---Select element dropdown attempt-->
+    <!-- <form action = "http://localhost:5000/mainpage/" method = "POST"></form> -->
       <nav>
-        <select id="dropdown-menu" class="form-control">
+        <select id="dropdown-menu" class="form-control" name="game-menu">
           <option value="null">Choose Game</option>
           {% for game in gameOptions.values() %}
-          <option id={{game[0]}} class="sel-game-btn" value="test">{{ game[1] }}</option>}
+          <option id={{game[0]}} class="sel-game-btn" value="test">{{ game[1] }}</option>
           {% endfor %}
         </select>
+        <button onclick="test();">Click Me!</button>
       </nav>
+    <!-- </form> -->
+
+    <!-- <nav>
+      <select id="dropdown-menu" class="form-control" name="game-menu">
+        <input value="null">Choose Game</option>
+        {% for game in gameOptions.values() %}
+        <input type="button" onsubmit=test() id={{game[0]}} class="sel-game-btn" value="test">{{ game[1] }}</input>
+        {% endfor %}
+      </select>
+    </nav> -->
 
       
       <!-- </div> -->
@@ -75,11 +87,18 @@
       <aside>
         <h2>Leaderboard</h2>
 
+        {% if UserList == "null" %}
+          <ul>
+            <li>Select Game to see Leaderboard</li>
+          </ul>
+  
+        {% else %}
         <ol>
-          <li>{{ UserList[0][0] }} : {{ UserList[0][1] }}</li> <br>
-          <li>{{ UserList[1][0] }} : {{ UserList[1][1] }}</li> <br>
-          <li>{{ UserList[2][0] }} : {{ UserList[2][1] }}</li> <br>
+          <li>{{ UserList.get('0') }} : {{ UserList.get('0') }}</li> <br>
+          <li>{{ UserList.get('0') }} : {{ UserList.get('0') }}</li> <br>
+          <li>{{ UserList.get('0') }} : {{ UserList.get('0') }}</li> <br>
         </ol>
+        {% endif %}
       </aside>
 
       <!-- An article -->

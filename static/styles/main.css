@@ -139,13 +139,16 @@ div input[type=submit] {
 
 /*Nav Bar Menu*/
 #dropdown-btn {
-    width: -webkit-fill-available;
+    /* width: -webkit-fill-available; */
     background-color: #24abbd;
 }
 
 #dropdown-menu {
-    width: -webkit-fill-available;
+    /* width: -webkit-fill-available; */
+    display: block;
+    margin: auto;
     text-align: center;
+    text-align-last: center;
     background-color: #24abbd;
     color: black;
 }
