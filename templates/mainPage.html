@@ -4,8 +4,14 @@
 
     <title>Third-Party Matchmaking</title>
     <script src="../static/scripts/main.js"></script>
-    <link rel="stylesheet" type="text/css" href="../static/styles/main.css"/>
     
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script async src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script async src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="../static/styles/main.css"/>
   </head>
 
   
@@ -20,16 +26,47 @@
         <a href="../signin">Log out</a>
         </div>
         <h1 id="title">Third-Party Game Matchmaking</h1>
+      <!---Drop down menu nav bar option-->
+      <!-- <nav>
+      <div id="dropdown" class="dropdown">
+        <button id="dropdown-btn" class="btn dropdown-toggle" type="button" data-toggle="dropdown">Choose Game</button>
+        <div id="dropdown-menu" class="dropdown-menu">
+          <button class="dropdown-item" type="button"> Game1 here</a>
+          <button class="dropdown-item" type="button"> Game2 here</a>
+          <button class="dropdown-item" type="button"> Game3 here</a>
+          <button class="dropdown-item" type="button"> Game4 here</a>
+        </div>
+      </div>
+      </nav> -->
+
+      <!---Select element dropdown attempt-->
+      <nav>
+        <select id="dropdown-menu" class="form-control">
+          <option value="null">Choose Game</option>
+          {% for game in gameOptions.values() %}
+          <option id={{game[0]}} class="sel-game-btn" value="test">{{ game[1] }}</option>}
+          {% endfor %}
+        </select>
+      </nav>
+
+      
       <!-- </div> -->
       <!-- Common practice to put the main navigation menu within the main header -->
-      <div id="nav-bar" class="navbar-collapse collapse">
+      <!-- <div id="nav-bar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
+          <li><select name="author">
+            <option value=null>Choose Game</option>
+            {% for game in gameOptions.values() %}
+            <option value="test">{{ game[1] }}</option>}
+            {% endfor %}
+        </select></li> -->
+        <!-- <ul>
           <li id="game1"><button id="g1btn" class="game-btn" type="submit">Tic Tac Toe</button></li>
           <li id="game2"><button id="g2btn" class="game-btn" type="submit">Donkey Kong</button></li>
           <li id="game3"><button id="g3btn" class="game-btn" type="submit">Super Mario</button></li>
           <li id="game4"><button id="g4btn" class="game-btn" type="submit">Snake</button></li>
-        </ul>
-      </nav>
+        </ul> -->
+      <!-- </nav> -->
     </header>
 
     <div>
@@ -57,6 +94,14 @@
             <li>Contact your opponent by email to schedule</li>
             <li>Have fun playing!</li>
         </ol>
+
+        <!--Attempt to use jinja for loop to create the different matchup buttons that will be displayed-->
+        {% for game in gameOptions.values() %}
+        <div id="Tab{{ game[0] }}" style="display: none;">
+          <h2>{{ game[1] }}</h2>
+          <button class="match-btn" id="{{ game[0] }}"  type="button">REQUEST MATCHUP</button>
+        </div>
+        {% endfor %}
 
         <div class="Game1" id="Tab1" style="display: none;">
           <h2>Tic Tac Toe</h2>

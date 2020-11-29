@@ -61,7 +61,17 @@ c.execute('''
             ''')
 
 c.execute('''
-            DELETE FROM Users where username="gamer500";''')
+            CREATE TABLE IF NOT EXISTS Games (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT
+            );
+            ''')
+conn.commit()
+
+
+# c.execute('''
+#             DELETE FROM Games where id > 4;
+#             ''')
 
 conn.commit()
 
@@ -229,7 +239,15 @@ def main_page():
     #     print(holder)
 
     # print(profileData['icon'])
-    return render_template("mainPage.html", profileData=profileData, UserList=UserList)
+
+    #Getting all the possible games
+    gameOptions = dict()
+    gamesCursor = get_db().cursor()
+    gamesCursor.execute('SELECT id, name FROM Games;')
+    for game in gamesCursor:
+        gameOptions[game[0]] = game
+    print(gameOptions)
+    return render_template("mainPage.html", profileData=profileData, UserList=UserList, gameOptions=gameOptions)
 
 @app.route("/profilepage/", methods=["GET"])
 def profile_page():
@@ -387,7 +405,7 @@ def post_matchup_window_accept():
 
 @app.route("/matchdeclined/", methods=["POST"])
 def post_matchup_window_decline():
-    return redirect(url_for("main_page"))
+    return redirect(url_for("match_declined"))
 
 @app.route("/acceptconfirmation/", methods=["GET"])
 def match_accepted():

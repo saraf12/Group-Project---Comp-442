@@ -5,17 +5,48 @@ window.addEventListener("DOMContentLoaded", function() {
     for(var i = 0; i < len; i++){
         requestBtn[i].addEventListener("click", getMatch);
     }
+
+
+    let selectGameDropdown = document.getElementById("dropdown-menu");
+    selectGameDropdown.addEventListener("change", selGame);
+
     
-    let game1btn = document.getElementById("game1");
-    game1btn.addEventListener("click", selectGame1);
-    let game2btn = document.getElementById("game2");
-    game2btn.addEventListener("click", selectGame2);
-    let game3btn = document.getElementById("game3");
-    game3btn.addEventListener("click", selectGame3);
-    let game4btn = document.getElementById("game4");
-    game4btn.addEventListener("click", selectGame4);
+    // let game1btn = document.getElementById("game1");
+    // game1btn.addEventListener("click", selectGame1);
+    // let game2btn = document.getElementById("game2");
+    // game2btn.addEventListener("click", selectGame2);
+    // let game3btn = document.getElementById("game3");
+    // game3btn.addEventListener("click", selectGame3);
+    // let game4btn = document.getElementById("game4");
+    // game4btn.addEventListener("click", selectGame4);
 
 });
+
+function selGame() {
+    console.log("made it inside the function!");
+    let idOfSelGame = this.options[this.options.selectedIndex].id;
+    console.log(idOfSelGame);
+    console.log(this.options);
+
+    let idOfTab = "Tab" + idOfSelGame;
+
+    console.log(this.options.length);
+
+    for(let i = 1; i < this.options.length; i++){
+        console.log(this.options);
+        let idOfCurrTab = "Tab" + this.options[i].id;
+        console.log(idOfCurrTab);
+        let currTab = document.getElementById(idOfCurrTab);
+        console.log(currTab);
+        if(this.options[i].id == idOfSelGame) {
+           currTab.style.display = "inline"
+        }
+        else {
+            currTab.style.display = "none";
+        }
+    }
+    
+}
 
 function getMatch(){
     popupWindow.open("/matchup/", "matchup", "width=500,height=500");

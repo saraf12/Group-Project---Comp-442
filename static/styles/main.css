@@ -17,6 +17,7 @@ aside {
 
 main {
     background-color: white;
+    padding: 2rem;
 }
 
 footer {
@@ -125,8 +126,8 @@ div input[type=submit] {
     position: absolute;
     align-content: right;
     border: black;
-    width: 50px; 
-    height: 50px;
+    width: 5rem; 
+    height: 5rem;
     right: 20px;
     padding: 1rem;
 }
@@ -136,7 +137,26 @@ div input[type=submit] {
 }
 
 
+/*Nav Bar Menu*/
+#dropdown-btn {
+    width: -webkit-fill-available;
+    background-color: #24abbd;
+}
 
+#dropdown-menu {
+    width: -webkit-fill-available;
+    text-align: center;
+    background-color: #24abbd;
+    color: black;
+}
+
+.dropdown-item:active {
+    color: black;
+}
+
+.dropdown-item:hover {
+    background-color: grey;
+}
 
 
 /*Page Layout*/
@@ -154,7 +174,7 @@ div aside {
 div main {
     flex: 2;
     margin: 10;
-    padding: 1rem;
+    padding: 2rem;
 }
 
 footer {
