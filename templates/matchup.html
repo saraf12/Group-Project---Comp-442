@@ -29,6 +29,7 @@
         <form action = "http://localhost:5000/matchaccepted/" method = "POST">
         <input type="hidden" name="opponent-username" id="opponent-username" value="{{ opponentData[0] }}">
         <input type="hidden" name="current-username" id="current-username" value="{{ currUserData.username }}">
+        <input type="hidden" name="gametype" id="gametype" value="{{ gametype }}">
         
 
             <button class="matchupbtn" id ="AcceptedRequest" type="submit">Accept</button> <br>

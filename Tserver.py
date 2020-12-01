@@ -32,7 +32,7 @@ conn = sqlite3.connect(dbpath)
 c = conn.cursor()
 
 # c.execute('''
-#             DROP TABLE IF EXISTS Stats;
+#             DROP TABLE IF EXISTS Games;
 #             ''')
 
 
@@ -100,11 +100,11 @@ c.execute('''
 conn.commit()
 
 # c.execute('''
-#             INSERT INTO Stats (user, game, wins, losses, totGamesPlayed) VALUES (3, 2, 3, 3, 6);
+#             INSERT INTO Games (name) VALUES ("MarioKart");
 #             ''')
 
 # c.execute('''
-#             DELETE FROM Stats where id = 5;
+#             DELETE FROM Games where id = 1 or id = 2;
 #             ''')
 
 conn.commit()
@@ -435,18 +435,31 @@ def get_matchup_window(gametype):
     currUserData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     currUserData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
 
+    # Code trying to get the current user's performance rating
+    currUserData['performanceRating'] = c.execute('''SELECT performanceRating 
+                                                    FROM Stats
+                                                    WHERE user=? and game=?;''',
+                                                    (curr_uid, gametype,)).fetchone()[0]
+
     # DON'T WORK RIGHT NOW BECAUSE DON'T HAVE PERFORMANCE RATING SCHEMA SET YET
-    # lowerLimit = currUserData['performanceRating'] - 200
-    # upperLimit = currUserData['performanceRating'] + 200
+    lowerLimit = currUserData['performanceRating'] - 200
+    upperLimit = currUserData['performanceRating'] + 200
+
+    opponentData = c.execute('''SELECT username, email, performanceRating 
+                                                    FROM Stats JOIN Users ON Stats.user=Users.id
+                                                    WHERE performanceRating>=? AND performanceRating<=?
+                                                    AND NOT Stats.user=? 
+                                                    ORDER BY RANDOM() LIMIT 1;''',
+                                                    (lowerLimit, upperLimit, curr_uid,)).fetchone()
 
     # opponentData = c.execute('''SELECT username, email, performanceRating FROM Users 
     #    WHERE performanceRating >= ? AND performanceRating <= ? AND NOT id=? ORDER BY RANDOM() LIMIT 1;''', 
     #     (lowerLimit, upperLimit, curr_uid,)).fetchone()
 
-    opponentData = ("Billy", "b@email.com", 300)
+    # opponentData = ("Billy", "b@email.com", 300)
     
 
-    return render_template("matchup.html", currUserData=currUserData, opponentData=opponentData)
+    return render_template("matchup.html", currUserData=currUserData, opponentData=opponentData, gametype=gametype)
 
 @app.route("/matchaccepted/", methods=["POST"])
 def post_matchup_window_accept():
@@ -459,9 +472,23 @@ def post_matchup_window_accept():
     currentUsername = request.form.get('current-username')
     opponentUsername = request.form.get('opponent-username')
 
-    # NEED TO BE UPDATED TO GET SENT TO THE CORRECT GAME TABLE
-    c.execute('INSERT INTO Matches (username1, username2) VALUES (?,?);', 
-            (currentUsername, opponentUsername,))
+    # Code attempting to insert match data into appropriate table
+    gametype = request.form.get('gametype')
+
+    gameTableName = c.execute('SELECT name FROM Games where id=?', (gametype,)).fetchone()[0]
+
+    print(gameTableName)
+
+
+    sqlInsert = "INSERT INTO " + gameTableName + " (username1, username2, status) VALUES (?,?,?);"
+
+    c.execute(sqlInsert,(currentUsername, opponentUsername, "Requested",))
+
+
+
+    # # NEED TO BE UPDATED TO GET SENT TO THE CORRECT GAME TABLE
+    # c.execute('INSERT INTO Matches (username1, username2) VALUES (?,?);', 
+    #         (currentUsername, opponentUsername,))
     regdb.commit()
     return redirect(url_for("match_accepted"))
 
