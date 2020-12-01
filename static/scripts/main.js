@@ -41,11 +41,33 @@ function selGame() {
         let currTab = document.getElementById(idOfCurrTab);
        // console.log(currTab);
         if(this.options[i].id == idOfSelGame) {
-           currTab.style.display = "inline"
+           currTab.style.display = "inline";
            selectedGame = this.options[i].id;
         }
         else {
             currTab.style.display = "none";
+        }
+    }
+
+    let lbid = "lb" + idOfSelGame;
+    let lb = document.getElementsByClassName("lb");
+    // let correctlb = document.getElementById(lbid);
+    console.log(lb);
+
+    console.log(lb.length);
+
+    for(let i = 0; i < lb.length; i++) {
+        console.log("This is lb[i]:")
+        console.log(lb[i]);
+        let idOfCurrLb = lb[i].id;
+        let currLb = document.getElementById(idOfCurrLb);
+        console.log(idOfCurrLb);
+        console.log(currLb);
+        if(idOfCurrLb == lbid) {
+            currLb.style.display = "inline";
+        }
+        else {
+            currLb.style.display = "none";
         }
     }
 
@@ -116,7 +138,10 @@ function test() {
 }
 
 function getMatch(){
-    popupWindow.open("/matchup/", "matchup", "width=500,height=500");
+    console.log(this.id);
+    let matchupurl = "/matchup/" + this.id;
+    console.log(matchupurl);
+    popupWindow.open(matchupurl, "matchup", "width=500,height=500");
     // popupWindow = window.open("matchup.html","matchup","width=300,height=200");
  
 }

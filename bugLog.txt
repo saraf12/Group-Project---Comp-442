@@ -5,3 +5,7 @@ Bug: Getting the popup windonw for the requested match to close itself. Open. Me
 Bug: Columns for performanceRating, wins, and losses are not auto filling with zeros upon account creation. Open. Medium priority. Date reported: 11/20/2020. Submitted by Tirzah Lloyd.
 Bug: Log out link on opposite side of page from profile icon. Open. Low priority. Date reported: 11/20/2020. Submitted by Tirzah Lloyd.
 Bug: Unless a color is explicitly selected, the profile icon is changed to black after any changes on edit profile page are saved. Open. Low priority. Date reported: 11/20/2020.  Submitted by Tirzah Lloyd.
+
+
+Bug: Leaderboard doesn't show the correct info. Open. High Priority. Date reported: 11/29/20. Submitted by Tirzah Lloyd.
+Bug: Opponent data in matchup window is currently hard coded and not actually picking an opponent. Open. High Priority. Date reported: 11/29/20. Submitted by Tirzah Lloyd.

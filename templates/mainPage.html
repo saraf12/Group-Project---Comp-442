@@ -48,7 +48,7 @@
           <option id={{game[0]}} class="sel-game-btn" value="test">{{ game[1] }}</option>
           {% endfor %}
         </select>
-        <button onclick="test();">Click Me!</button>
+        <!-- <button onclick="test();">Click Me!</button> -->
       </nav>
     <!-- </form> -->
 
@@ -83,8 +83,10 @@
 
     <div>
 
-          <!-- the aside content can also be nested within the main content -->
+          <!-- the aside content can also be nested within the main content
       <aside>
+        
+        The Leaderboard is NOT working!!
         <h2>Leaderboard</h2>
 
         {% if UserList == "null" %}
@@ -94,11 +96,35 @@
   
         {% else %}
         <ol>
-          <li>{{ UserList.get('0') }} : {{ UserList.get('0') }}</li> <br>
+          <li>{{ UserList.get('1')[0] }} : {{ UserList.get('1')[0] }}</li> <br>
           <li>{{ UserList.get('0') }} : {{ UserList.get('0') }}</li> <br>
           <li>{{ UserList.get('0') }} : {{ UserList.get('0') }}</li> <br>
         </ol>
         {% endif %}
+
+        
+      </aside> -->
+
+      <aside>
+
+        <div class="lb" id="placeholderLB" style="display: inline">
+          <h2>Leaderboard</h2>
+            <ul>
+              <li>Select game to display leaderboard</li>
+            </ul>
+        </div>
+        
+        {% for game, user in UserList.items() %}
+          <div class="lb" id="lb{{ game }}" style="display: none">
+            <h2>Leaderboard</h2>
+            <ol>
+              <li>{{ user[0][0] }} : {{ user[0][1] }}</li>
+              <li>{{ user[1][0] }} : {{ user[1][1] }}</li>
+              <li>{{ user[2][0] }} : {{ user[2][1] }}</li>
+            </ol>
+          </div>
+        {% endfor %}
+        
       </aside>
 
       <!-- An article -->
@@ -121,6 +147,10 @@
           <button class="match-btn" id="{{ game[0] }}"  type="button">REQUEST MATCHUP</button>
         </div>
         {% endfor %}
+
+        <!--********************************************************************************-->
+
+        <!--The code below this is not being used right now!!-->
 
         <div class="Game1" id="Tab1" style="display: none;">
           <h2>Tic Tac Toe</h2>
