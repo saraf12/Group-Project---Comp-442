@@ -2,6 +2,7 @@ import sqlite3
 import os
 import base64
 import time
+import decimal
 from datetime import datetime, timedelta
 from traceback import print_exc
 from cryptography.fernet import Fernet
@@ -108,7 +109,11 @@ conn.commit()
 #             ''')
 
 # c.execute('''
-#             UPDATE TicTacToe SET status="Requested" WHERE id=1;
+#             UPDATE Stats SET performanceRating="1200" WHERE id=4;
+#             ''')
+
+# c.execute('''
+#             UPDATE TicTacToe SET winnerAccordingToU2=NULL WHERE id=1;
 #             ''')
 
 conn.commit()
@@ -375,27 +380,40 @@ def updaterecord():
     matchId = request.form['matchId']
     name = "result" + str(matchId)
     r = request.form.getlist('result')
+    opponentUsername = request.form.get('opponent')
     user = int(request.form['user'])
     regdb = get_db()
     c = get_db().cursor()
     currUsername = c.execute('SELECT username FROM Users WHERE id=?',(curr_uid,)).fetchone()[0]
     if len(r) > 0:
         result = r[0]
+        print(result)
         if(user == 1):
-            c.execute('UPDATE {} SET winnerAccordingToU1 =? WHERE id =?;'.format(game),(result, matchId))
+            c.execute('UPDATE {} SET winnerAccordingToU1 =? WHERE id =?;'.format(game),(result, matchId,))
         else:
-            c.execute('UPDATE {} SET winnerAccordingToU2 =? WHERE id =?;'.format(game),(result, matchId))
+            c.execute('UPDATE {} SET winnerAccordingToU2 =? WHERE id =?;'.format(game),(result, matchId,))
         #Code attempting to increment wins or losses and total Games
         if result == currUsername:
-            c.execute('UPDATE Stats SET wins = wins+1 WHERE user=? AND game=?;',(curr_uid, matchId))
+            c.execute('UPDATE Stats SET wins = wins+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
+            #Code attempting to update performanceRating
+            opponentUserId = c.execute('SELECT id FROM Users WHERE username=?;',(opponentUsername,)).fetchone()[0]
+            opponentPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(opponentUserId, matchId,)).fetchone()[0]
+            additionToPR = decimal.Decimal(opponentPR) * decimal.Decimal(0.25)
+            currentUserPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(curr_uid, matchId,)).fetchone()[0]
+            newPR = additionToPR + currentUserPR
+            newPR = str(newPR)
+            c.execute('UPDATE Stats SET performanceRating=? WHERE user=? AND game=?;',(newPR, curr_uid, matchId,))
         else:
-            c.execute('UPDATE Stats SET losses = losses+1 WHERE user=? AND game=?;',(curr_uid, matchId))
-        c.execute('UPDATE Stats SET totGamesPlayed = totGamesPlayed+1 WHERE user=? AND game=?;',(curr_uid, matchId))
-
-        #Code attempting to update performanceRating
-        # c.execute('SELECT id FROM Users WHERE username=?',(r[1]))
-
-
+            c.execute('UPDATE Stats SET losses = losses+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
+            #Code attempting to update performanceRating
+            opponentUserId = c.execute('SELECT id FROM Users WHERE username=?;',(opponentUsername,)).fetchone()[0]
+            opponentPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(opponentUserId, matchId,)).fetchone()[0]
+            additionToPR = decimal.Decimal(opponentPR) * decimal.Decimal(0.25)
+            currentUserPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(curr_uid, matchId,)).fetchone()[0]
+            newPR = additionToPR + currentUserPR
+            newPR = str(newPR)
+            c.execute('UPDATE Stats SET performanceRating=? WHERE user=? AND game=?;',(newPR, curr_uid, matchId,))
+        c.execute('UPDATE Stats SET totGamesPlayed = totGamesPlayed+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
 
     regdb.commit()
     return redirect(url_for("profile_page"))
