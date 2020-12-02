@@ -75,6 +75,7 @@
                             <label>Win</label><br>
                             <input type="radio" name="result" value="{{match.username}}">
                             <label>Loss</label>
+                            <input type="hidden" name="opponent" value="{{match.username}}">
                         </td>
                         <td><button type="submit" formmethod="post" name="submitRecord" >Submit</button></td>
                         {% endif %}
