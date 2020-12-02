@@ -67,7 +67,7 @@ def post_signin():
 
     if data['username'] == "admin":
         return redirect(url_for("get_admin"))
-    return redirect(url_for("blank_main.html"))
+    return redirect(url_for("get_admin_dashboard"))
 
 #22222~~~~~
 @app.route("/admin/", methods = ["GET"])
