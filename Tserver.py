@@ -108,7 +108,7 @@ conn.commit()
 #             ''')
 
 # c.execute('''
-#             UPDATE TicTacToe SET status="Requested" WHERE id=1 or id=3;
+#             UPDATE TicTacToe SET status="Requested" WHERE id=1;
 #             ''')
 
 conn.commit()
