@@ -13,7 +13,7 @@ app.config["SECRET_KEY"] = "correcthorsebatterystaple"
 
 scriptdir = os.path.dirname(__file__)
 
-dbpath = os.path.join(scriptdir, "Jed.sqlite3")
+dbpath = os.path.join(scriptdir, "Jedidiah.sqlite3")
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -40,9 +40,34 @@ c.execute('''
             ''')
 
 c.execute('''
+            CREATE TABLE IF NOT EXISTS Users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE,
+                name TEXT,
+                email TEXT,
+                passwordhash TEXT,
+                icon TEXT
+            );
+            ''')
+
+c.execute('''
             CREATE TABLE IF NOT EXISTS Games (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT
+                name TEXT UNIQUE
+            );
+            ''')
+
+c.execute('''
+            CREATE TABLE IF NOT EXISTS Stats (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user TEXT,
+                game INTEGER,
+                performanceRating INTEGER DEFAULT 1200,
+                wins INTEGER DEFAULT 0,
+                losses INTEGER DEFAULT 0,
+                totGamesPlayed INTEGER DEFAULT 0,
+                FOREIGN KEY (user) REFERENCES Users(id),
+                FOREIGN KEY (game) REFERENCES Games(id)
             );
             ''')
 
@@ -77,8 +102,6 @@ def get_admin():
 #33333~~~~~
 @app.route("/admin/", methods = ["POST"])
 def post_admin():
-    admindb = get_db()
-    c = get_db().cursor()
 
     fields = ['username', 'password']
 
@@ -117,18 +140,31 @@ def post_admin():
 def get_admin_dashboard():
     return render_template("blank_main.html")
 
-def create_games_table(conn):
-    c = conn.cursor()
+@app.route("/admin_dashboard/", methods = ["POST"])
+def post_admin_dashboard():
+    admindb = get_db()
+    c = get_db().cursor()
 
-    r = c.execute('''
-    
+    game_name = request.form.get('game_name')
+
+    r = c.execute(f'''
+        CREATE TABLE IF NOT EXISTS game_name = "{game_name}" (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username1 TEXT,
+                username2 TEXT,
+                winnerAccordingToU1 TEXT,
+                winnerAccordingToU2 TEXT,
+                status TEXT,
+                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+                FOREIGN KEY (username1) REFERENCES Users(id),
+                FOREIGN KEY (username2) REFERENCES Users(id)
+            );
                      ''')
 
-    conn.commit()
+    admindb.commit()
+    return redirect(url_for("get_admin_dashboard"))
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-create_games_table(conn)
 
 conn.close()

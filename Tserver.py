@@ -32,7 +32,7 @@ conn = sqlite3.connect(dbpath)
 c = conn.cursor()
 
 # c.execute('''
-#             DROP TABLE IF EXISTS Games;
+#             DROP TABLE IF EXISTS Snake;
 #             ''')
 
 
@@ -622,7 +622,38 @@ def get_admin_dashboard():
 
 @app.route("/admin_create_game/", methods = ["POST"])
 def post_create_game_cat():
-    
-    return render_template("blank_main.html")
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
 
+    gameToAdd = request.form.get('gamename')
+
+    alreadyExists = c.execute('SELECT id, name FROM Games WHERE name=?',(gameToAdd,)).fetchone()
+    if alreadyExists:
+        flash(f"Game category entered already exists")
+        return redirect(url_for("get_admin_dashboard"))
     
+    c.execute('''
+            CREATE TABLE IF NOT EXISTS {} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username1 TEXT,
+                username2 TEXT,
+                winnerAccordingToU1 TEXT,
+                winnerAccordingToU2 TEXT,
+                status TEXT,
+                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+                FOREIGN KEY (username1) REFERENCES Users(id),
+                FOREIGN KEY (username2) REFERENCES Users(id)
+            );
+            '''.format(gameToAdd))
+    
+    c.execute('''
+            INSERT INTO Games (name) VALUES (?);
+            ''',(gameToAdd,))
+    
+    regdb.commit()
+    flash(f"Game has been added")
+    return redirect(url_for("get_admin_dashboard"))    
