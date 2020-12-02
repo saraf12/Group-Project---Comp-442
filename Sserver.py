@@ -375,10 +375,23 @@ def updaterecord():
     if len(r) > 0:
         result = r[0]
         if(user == 1):
+            otherResult = c.execute('SELECT winnerAccordingToU2 FROM {} WHERE id=?;'.format(game),(matchId,)).fetchone()
             c.execute('UPDATE {} SET winnerAccordingToU1 =? WHERE id =?;'.format(game),(result, matchId))
+            #If all result is reported check if they match
+            if otherResult is not None:
+                if result != otherResult:
+                    c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Conflicted", matchId))
+                else:
+                    c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Done", matchId))
         else:
+            otherResult = c.execute('SELECT winnerAccordingToU1 FROM {} WHERE id=?;'.format(game),(matchId,)).fetchone()
             c.execute('UPDATE {} SET winnerAccordingToU2 =? WHERE id =?;'.format(game),(result, matchId))
-
+            #If all result is reported check if they match
+            if otherResult is not None:
+                if result != otherResult:
+                    c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Conflicted", matchId))
+                else:
+                    c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Done", matchId))
     regdb.commit()
     return redirect(url_for("profile_page"))
 
@@ -498,4 +511,51 @@ def match_declined():
 
 
 
+@app.route("/admin_dashboard/", methods = ["GET"])
+def get_admin_dashboard():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
+
+    Users = dict()
+
+    userlist = c.execute('SELECT username, name, email FROM Users;').fetchall()
+    i = 0
+    for record in userlist:
+        Users[i] = record
+        i = i+1
+
+    Matches = dict()
+    
+    allTypesOfGames = c.execute('SELECT id, name FROM Games;').fetchall()
+
+    for game in allTypesOfGames:
+        theseGms = c.execute('SELECT id, username1, username2, dateCreated, status FROM {};'.format(game[1])).fetchall()
+        i = 0
+        for gm in theseGms:
+            Matches[i] = (game[1], gm)
+            i = i+1
+
+
+    #############################
+    regdb.row_factory = lambda cursor, row: row[0]
+    c = regdb.cursor()
+    conflictedList = dict()
+    games = []
+    games = c.execute('SELECT name FROM Games').fetchall()
+
+    for g in games:
+        conflicted = c.execute('SELECT * FROM {} WHERE status=?'.format(g), ("Conflicted",)).fetchall()
+        conflictedList[g] = conflicted
+    #############################
+
+    return render_template("SadminDash.html", Users=Users, Matches=Matches, games=games, conflict= conflictedList)
+
+@app.route("/admin_create_game/", methods = ["POST"])
+def post_create_game_cat():
+    
+    return render_template("blank_main.html")
     
