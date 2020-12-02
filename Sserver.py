@@ -375,10 +375,23 @@ def updaterecord():
     if len(r) > 0:
         result = r[0]
         if(user == 1):
+            otherResult = c.execute('SELECT winnerAccordingToU2 FROM {} WHERE id=?;'.format(game),(matchId,)).fetchone()
             c.execute('UPDATE {} SET winnerAccordingToU1 =? WHERE id =?;'.format(game),(result, matchId))
+            #If all result is reported check if they match
+            if otherResult is not None:
+                if result != otherResult:
+                    c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Conflicted", matchId))
+                else:
+                    c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Done", matchId))
         else:
+            otherResult = c.execute('SELECT winnerAccordingToU1 FROM {} WHERE id=?;'.format(game),(matchId,)).fetchone()
             c.execute('UPDATE {} SET winnerAccordingToU2 =? WHERE id =?;'.format(game),(result, matchId))
-
+            #If all result is reported check if they match
+            if otherResult is not None:
+                if result != otherResult:
+                    c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Conflicted", matchId))
+                else:
+                    c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Done", matchId))
     regdb.commit()
     return redirect(url_for("profile_page"))
 
@@ -498,4 +511,78 @@ def match_declined():
 
 
 
+@app.route("/admin_dashboard/", methods = ["GET"])
+def get_admin_dashboard():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
+
+    Users = dict()
+
+    userlist = c.execute('SELECT username, name, email FROM Users;').fetchall()
+    i = 0
+    for record in userlist:
+        Users[i] = record
+        i = i+1
+
+    Matches = dict()
+    
+    allTypesOfGames = c.execute('SELECT id, name FROM Games;').fetchall()
+
+    for game in allTypesOfGames:
+        theseGms = c.execute('SELECT id, username1, username2, dateCreated, status FROM {};'.format(game[1])).fetchall()
+        i = 0
+        for gm in theseGms:
+            Matches[i] = (game[1], gm)
+            i = i+1
+
+
+    #############################
+    regdb.row_factory = lambda cursor, row: row[0]
+    c = regdb.cursor()
+    conflictedList = dict()
+    games = []
+    games = c.execute('SELECT name FROM Games').fetchall()
+
+    for g in games:
+        cId = c.execute('SELECT id FROM {} WHERE status=?'.format(g), ("Conflicted",)).fetchall()
+        conflicList =[]      
+        for id in cId:
+            conflicted = dict()
+            conflicted["mId"] = id
+            conflicted["user1"] = c.execute('SELECT username1 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicted["user2"] = c.execute('SELECT username2 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicted["winnerAccordingToU1"] = c.execute('SELECT winnerAccordingToU1 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicted["winnerAccordingToU2"] = c.execute('SELECT winnerAccordingToU2 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicted["status"] = c.execute('SELECT status FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicList.append(conflicted)
+        conflictedList[g] = conflicList
+    #############################
+
+    return render_template("SadminDash.html", Users=Users, Matches=Matches, games=games, conflict= conflictedList)
+
+@app.route("/admin_dashboard/", methods=["POST"])
+def post__admin_dashboard():
+    regdb = get_db()
+    c = get_db().cursor()
+    wuser1 = request.form.get("winnerByUser1")
+    wuser2 = request.form.get("winnerByUser2")
+    status = request.form.get("status")
+    game = request.form.get("game")
+    mId = request.form.get("matchID")
+
+    c.execute('UPDATE {} SET winnerAccordingToU1=? WHERE id=?'.format(game),(wuser1,mId))
+    c.execute('UPDATE {} SET winnerAccordingToU2=? WHERE id=?'.format(game),(wuser2,mId))
+    c.execute('UPDATE {} SET status=? WHERE id=?'.format(game),(status,mId))
+
+    regdb.commit()
+    return redirect(url_for("get_admin_dashboard"))
+
+@app.route("/admin_create_game/", methods = ["POST"])
+def post_create_game_cat():
+    
+    return render_template("blank_main.html")
     
