@@ -1,0 +1,20 @@
+body {
+    margin: 1rem;
+}
+
+h1 {
+    background-color: lightsalmon;
+    padding: 1rem;
+}
+
+a { 
+    color: #24abbd;
+}
+
+a:hover {
+    color: black;
+}
+
+h3 {
+    text-align: center;
+}

@@ -107,6 +107,10 @@ conn.commit()
 #             DELETE FROM Games where id = 1 or id = 2;
 #             ''')
 
+# c.execute('''
+#             UPDATE TicTacToe SET status="Requested" WHERE id=1;
+#             ''')
+
 conn.commit()
 
 serverdir = os.path.dirname(__file__)
@@ -503,6 +507,78 @@ def match_accepted():
 @app.route("/declineconfirmation/", methods=["GET"])
 def match_declined():
     return render_template("declinePage.html")
+
+@app.route("/inbox/", methods=["GET"])
+def get_inbox():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
+
+    currUsername = c.execute('SELECT username FROM Users WHERE id=?',(curr_uid,)).fetchone()[0]
+   # print(currUsername)
+
+    requestedGames = dict()
+    requesterOfGames = dict()
+
+    allTypesOfGames = c.execute('SELECT id, name FROM Games;').fetchall()
+
+    #print(allTypesOfGames)
+
+    for game in allTypesOfGames:
+        sqlSelect1 = "SELECT id, username2, dateCreated FROM " + game[1] + " WHERE username1=? AND status=\"Requested\";"
+        gamesWithUserAsRequester = c.execute(sqlSelect1,(currUsername,)).fetchall()
+        i = 0
+        for gm in gamesWithUserAsRequester:
+            # print(gm)
+            requestedGames[i] = (game[1], gm)
+            # print(requestedGames[i])
+            i = i+1
+        sqlSelect2 = "SELECT id, username1, dateCreated, status FROM " + game[1] + " WHERE username2=?;"
+        gamesWithUserAsResponder = c.execute(sqlSelect2,(currUsername,)).fetchall()
+        for gm in gamesWithUserAsResponder:
+            # print(gm)
+            requesterOfGames[i] = (game[1], gm)
+            # print(requestedGames[i])
+            i = i+1
+
+    # for request in requestedGames.values():
+    #     if request:
+    #         print(request[1][0])       
+
+    return render_template("inbox.html", requestedGames=requestedGames, requesterOfGames=requesterOfGames)
+
+
+@app.route("/inbox/", methods=["POST"])
+def post_inbox():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
+
+
+
+    if request.form.get('submit-btn') == "accept":
+        gameId = request.form.get('gameid')
+        gameTable = request.form.get('gametable')
+        sqlString = "UPDATE " + gameTable + " SET status=\"Confirmed\" WHERE id=" + gameId + ";"
+        c.execute(sqlString)
+    
+    if request.form.get('submit-btn') == "decline":
+        gameId = request.form.get('gameid')
+        gameTable = request.form.get('gametable')
+        # ASK Sydney if she would rather a declined match be removed from the database
+        # but it might be good to keep it in as declined, so that you can let the other person know it was declined
+        sqlString = "UPDATE " + gameTable + " SET status=\"Declined\" WHERE id=" + gameId + ";"
+        c.execute(sqlString)
+    
+    regdb.commit()
+
+    return redirect(url_for("get_inbox"))
 
 
 
