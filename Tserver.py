@@ -592,7 +592,37 @@ def post_inbox():
 
 @app.route("/admin_dashboard/", methods = ["GET"])
 def get_admin_dashboard():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
 
-    return render_template("adminDash.html")
+    Users = dict()
+
+    userlist = c.execute('SELECT username, name, email FROM Users;').fetchall()
+    i = 0
+    for record in userlist:
+        Users[i] = record
+        i = i+1
+
+    Matches = dict()
+    
+    allTypesOfGames = c.execute('SELECT id, name FROM Games;').fetchall()
+
+    for game in allTypesOfGames:
+        theseGms = c.execute('SELECT id, username1, username2, dateCreated, status FROM {};'.format(game[1])).fetchall()
+        i = 0
+        for gm in theseGms:
+            Matches[i] = (game[1], gm)
+            i = i+1
+
+    return render_template("adminDash.html", Users=Users, Matches=Matches)
+
+@app.route("/admin_create_game/", methods = ["POST"])
+def post_create_game_cat():
+    
+    return render_template("blank_main.html")
 
     
