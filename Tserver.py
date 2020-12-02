@@ -32,7 +32,7 @@ conn = sqlite3.connect(dbpath)
 c = conn.cursor()
 
 # c.execute('''
-#             DROP TABLE IF EXISTS Games;
+#             DROP TABLE IF EXISTS Snake;
 #             ''')
 
 
@@ -649,6 +649,10 @@ def post_create_game_cat():
                 FOREIGN KEY (username2) REFERENCES Users(id)
             );
             '''.format(gameToAdd))
+    
+    c.execute('''
+            INSERT INTO Games (name) VALUES (?);
+            ''',(gameToAdd,))
     
     regdb.commit()
     flash(f"Game has been added")
