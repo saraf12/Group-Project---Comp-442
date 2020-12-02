@@ -552,6 +552,7 @@ def get_admin_dashboard():
         conflicList =[]      
         for id in cId:
             conflicted = dict()
+            conflicted["mId"] = id
             conflicted["user1"] = c.execute('SELECT username1 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
             conflicted["user2"] = c.execute('SELECT username2 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
             conflicted["winnerAccordingToU1"] = c.execute('SELECT winnerAccordingToU1 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
@@ -562,6 +563,23 @@ def get_admin_dashboard():
     #############################
 
     return render_template("SadminDash.html", Users=Users, Matches=Matches, games=games, conflict= conflictedList)
+
+@app.route("/admin_dashboard/", methods=["POST"])
+def post__admin_dashboard():
+    regdb = get_db()
+    c = get_db().cursor()
+    wuser1 = request.form.get("winnerByUser1")
+    wuser2 = request.form.get("winnerByUser2")
+    status = request.form.get("status")
+    game = request.form.get("game")
+    mId = request.form.get("matchID")
+
+    c.execute('UPDATE {} SET winnerAccordingToU1=? WHERE id=?'.format(game),(wuser1,mId))
+    c.execute('UPDATE {} SET winnerAccordingToU2=? WHERE id=?'.format(game),(wuser2,mId))
+    c.execute('UPDATE {} SET status=? WHERE id=?'.format(game),(status,mId))
+
+    regdb.commit()
+    return redirect(url_for("get_admin_dashboard"))
 
 @app.route("/admin_create_game/", methods = ["POST"])
 def post_create_game_cat():

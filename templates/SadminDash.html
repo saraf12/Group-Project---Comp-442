@@ -102,34 +102,38 @@
             <th>winnerAccordingToU2</th>
             <th>status</th>
         </tr>
-        {% for match in conflict[g] %}        
-        <tr>
-            <td>{{match.user1}}</td>
-            <td>{{match.user2}}</td>
-            <!-- <td>{{match.winnerAccordingToU1}}</td> -->
-            <td>
-                <select name="winnerByUser1">
-                    <option value="{{match.winnerAccordingToU1}}" selected>{{match.winnerAccordingToU1}}</option>
-                    <option value="{{match.winnerAccordingToU2}}">{{match.winnerAccordingToU2}}</option>
-                </select>
-            </td>
+        {% for match in conflict[g] %}
+        <form action = "http://localhost:5000/admin_dashboard/" method = "POST">   
+            <tr>
+                <input type="hidden" name="game" value="{{g}}">
+                <input type="hidden" name="matchID" value="{{match.mId}}">
+                <td>{{match.user1}}</td>
+                <td>{{match.user2}}</td>
+                <!-- <td>{{match.winnerAccordingToU1}}</td> -->
+                <td>
+                    <select name="winnerByUser1">
+                        <option value="{{match.winnerAccordingToU1}}" selected>{{match.winnerAccordingToU1}}</option>
+                        <option value="{{match.winnerAccordingToU2}}">{{match.winnerAccordingToU2}}</option>
+                    </select>
+                </td>
 
-            <!-- <td>{{match.winnerAccordingToU2}}</td> -->
-            <td>
-                <select name="winnerByUser1">
-                    <option value="{{match.winnerAccordingToU1}}">{{match.winnerAccordingToU1}}</option>
-                    <option value="{{match.winnerAccordingToU2}}" selected>{{match.winnerAccordingToU2}}</option>
-                </select>
-            </td>
-            <!-- <td>{{match.status}}</td> -->
-            <td>
-                <select name="status">
-                    <option value="{{match.status}}" selected>{{match.status}}</option>
-                    <option value="Done">Done</option>
-                </select>
-            </td>
-            <td><button>Submit</button></td>
-        </tr>
+                <!-- <td>{{match.winnerAccordingToU2}}</td> -->
+                <td>
+                    <select name="winnerByUser2">
+                        <option value="{{match.winnerAccordingToU1}}">{{match.winnerAccordingToU1}}</option>
+                        <option value="{{match.winnerAccordingToU2}}" selected>{{match.winnerAccordingToU2}}</option>
+                    </select>
+                </td>
+                <!-- <td>{{match.status}}</td> -->
+                <td>
+                    <select name="status">
+                        <option value="{{match.status}}" selected>{{match.status}}</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </td>
+                <td><button type="submit" formmethod="post">Submit</button></td>
+            </tr>
+        </form> 
         {% endfor %}
         <tr> 
             <td></td>
