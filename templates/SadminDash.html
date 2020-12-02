@@ -106,9 +106,28 @@
         <tr>
             <td>{{match.user1}}</td>
             <td>{{match.user2}}</td>
-            <td>{{match.winnerAccordingToU1}}</td>
-            <td>{{match.winnerAccordingToU2}}</td>
-            <td>{{match.status}}</td>
+            <!-- <td>{{match.winnerAccordingToU1}}</td> -->
+            <td>
+                <select name="winnerByUser1">
+                    <option value="{{match.winnerAccordingToU1}}" selected>{{match.winnerAccordingToU1}}</option>
+                    <option value="{{match.winnerAccordingToU2}}">{{match.winnerAccordingToU2}}</option>
+                </select>
+            </td>
+
+            <!-- <td>{{match.winnerAccordingToU2}}</td> -->
+            <td>
+                <select name="winnerByUser1">
+                    <option value="{{match.winnerAccordingToU1}}">{{match.winnerAccordingToU1}}</option>
+                    <option value="{{match.winnerAccordingToU2}}" selected>{{match.winnerAccordingToU2}}</option>
+                </select>
+            </td>
+            <!-- <td>{{match.status}}</td> -->
+            <td>
+                <select name="status">
+                    <option value="{{match.status}}" selected>{{match.status}}</option>
+                    <option value="Done">Done</option>
+                </select>
+            </td>
             <td><button>Submit</button></td>
         </tr>
         {% endfor %}
