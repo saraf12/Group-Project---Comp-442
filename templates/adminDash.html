@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title> Inbox/Sent </title>
+    
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../static/styles/inbox.css"/>
+</head>
+<body>
+	<h1>Users</h1>
+
+	{% if Users %}
+	<table class="table">
+		<tbody>
+			<tr>
+				<th>Username</th>
+				<th>Name</th>
+                <th>Email</th>
+                <th>Accept/Decline</th>
+			</tr>
+            {% for request in requestedGames.values() %}
+            {% if request %}
+			<tr>
+				<td>{{ request[1][1] }}</td>
+				<td>{{ request[0] }}</td>
+                <td>{{ request[1][2] }}</td>
+                <td>
+                    <form action = "http://localhost:5000/inbox/" method = "POST">
+                    <button class="responsebtn" type="submit" formmethod="post" name="submit-btn" value="accept"> Accept </button>
+                    <button class="responsebtn" type="submit" formmethod="post" name="submit-btn" value="decline"> Decline </button>
+                    <input type="hidden" name="gameid" id="gameid" value="{{ request[1][0] }}">
+                    <input type="hidden" name="gametable" id="gametable" value="{{ request[0] }}">
+                    </form>
+                </td>
+            </tr>
+            {% endif %}
+			{% endfor %}
+		</tbody>
+	</table>
+
+	{% else %}
+	<h2>No registered users</h2>
+    {% endif %}
+    
+    <h1>Sent</h1>
+
+	{% if requesterOfGames %}
+	<table class="table">
+		<tbody>
+			<tr>
+				<th>Opponent</th>
+				<th>Game</th>
+                <th>Date Requested</th>
+                <th>Status</th>
+			</tr>
+            {% for request in requesterOfGames.values() %}
+            {% if request %}
+			<tr>
+				<td>{{ request[1][1] }}</td>
+				<td>{{ request[0] }}</td>
+                <td>{{ request[1][2] }}</td>
+                <td>{{ request[1][3] }}</td>
+            </tr>
+            {% endif %}
+			{% endfor %}
+		</tbody>
+	</table>
+
+	{% else %}
+	<h2>No sent invitations</h2>
+	{% endif %}
+
+
+	<h3><button class="returnbtn"><a href="/profilepage/">Return to Profile Page</a></button></h3>
+	<h3><button class="returnbtn"><a href="/mainpage/">Return to Main Page</a></button></h3>
+</body>
+</html>

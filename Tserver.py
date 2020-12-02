@@ -590,5 +590,9 @@ def post_inbox():
     return redirect(url_for("get_inbox"))
 
 
+@app.route("/admin_dashboard/", methods = ["GET"])
+def get_admin_dashboard():
+
+    return render_template("adminDash.html")
 
     
