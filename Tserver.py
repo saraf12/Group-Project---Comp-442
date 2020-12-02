@@ -387,15 +387,14 @@ def updaterecord():
     currUsername = c.execute('SELECT username FROM Users WHERE id=?',(curr_uid,)).fetchone()[0]
     if len(r) > 0:
         result = r[0]
-        print(result)
         if(user == 1):
             c.execute('UPDATE {} SET winnerAccordingToU1 =? WHERE id =?;'.format(game),(result, matchId,))
         else:
             c.execute('UPDATE {} SET winnerAccordingToU2 =? WHERE id =?;'.format(game),(result, matchId,))
-        #Code attempting to increment wins or losses and total Games
+        #Code to increment wins or losses and total Games
         if result == currUsername:
             c.execute('UPDATE Stats SET wins = wins+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
-            #Code attempting to update performanceRating
+            #Code to update performanceRating
             opponentUserId = c.execute('SELECT id FROM Users WHERE username=?;',(opponentUsername,)).fetchone()[0]
             opponentPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(opponentUserId, matchId,)).fetchone()[0]
             additionToPR = decimal.Decimal(opponentPR) * decimal.Decimal(0.25)
@@ -405,7 +404,7 @@ def updaterecord():
             c.execute('UPDATE Stats SET performanceRating=? WHERE user=? AND game=?;',(newPR, curr_uid, matchId,))
         else:
             c.execute('UPDATE Stats SET losses = losses+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
-            #Code attempting to update performanceRating
+            #Code to update performanceRating
             opponentUserId = c.execute('SELECT id FROM Users WHERE username=?;',(opponentUsername,)).fetchone()[0]
             opponentPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(opponentUserId, matchId,)).fetchone()[0]
             additionToPR = decimal.Decimal(opponentPR) * decimal.Decimal(0.25)
@@ -497,8 +496,8 @@ def get_matchup_window(gametype):
                                                     (curr_uid, gametype,)).fetchone()[0]
 
     # DON'T WORK RIGHT NOW BECAUSE DON'T HAVE PERFORMANCE RATING SCHEMA SET YET
-    lowerLimit = currUserData['performanceRating'] - 200
-    upperLimit = currUserData['performanceRating'] + 200
+    lowerLimit = currUserData['performanceRating'] - 1200
+    upperLimit = currUserData['performanceRating'] + 1200
 
     opponentData = c.execute('''SELECT username, email, performanceRating 
                                                     FROM Stats JOIN Users ON Stats.user=Users.id
