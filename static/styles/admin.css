@@ -102,3 +102,18 @@ body {
     padding: 10px;
     width: 100%;
 }
+
+
+.footer {
+    margin: 10;
+    text-align: center;
+}
+
+#createAccountLink {
+    padding: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-size: small;
+    display: inline-block;
+    margin-bottom: 5px;
+}
