@@ -93,3 +93,28 @@ footer{
     border: 1px solid #ccc;
     border-top: none;
   }
+
+  #returntomain {
+      margin-bottom: 1rem;
+  }
+
+  #returntomain a:visited {
+    color: black;
+  }
+
+  #returntomain a {
+    text-decoration: none;
+  }
+
+  header {
+    background-color: #24abbd;
+    padding : 1rem;
+  }
+
+  #inboxbtn a:visited {
+    color: black;
+  }
+
+  #inboxbtn a {
+    text-decoration: none;
+  }

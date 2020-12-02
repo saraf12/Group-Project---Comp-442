@@ -31,8 +31,8 @@
                 <td>{{ request[1][2] }}</td>
                 <td>
                     <form action = "http://localhost:5000/inbox/" method = "POST">
-                    <button type="submit" formmethod="post" name="submit-btn" value="accept"> Accept </button>
-                    <button type="submit" formmethod="post" name="submit-btn" value="decline"> Decline </button>
+                    <button class="responsebtn" type="submit" formmethod="post" name="submit-btn" value="accept"> Accept </button>
+                    <button class="responsebtn" type="submit" formmethod="post" name="submit-btn" value="decline"> Decline </button>
                     <input type="hidden" name="gameid" id="gameid" value="{{ request[1][0] }}">
                     <input type="hidden" name="gametable" id="gametable" value="{{ request[0] }}">
                     </form>
@@ -76,7 +76,7 @@
 	{% endif %}
 
 
-	<h3><a href="/profilepage/">Return to Profile Page</a></h3>
-	<h3><a href="/mainpage/">Return to Main Page</a></h3>
+	<h3><button class="returnbtn"><a href="/profilepage/">Return to Profile Page</a></button></h3>
+	<h3><button class="returnbtn"><a href="/mainpage/">Return to Main Page</a></button></h3>
 </body>
 </html>

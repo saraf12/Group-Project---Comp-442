@@ -5,16 +5,22 @@
     <script src="../static/scripts/profile.js"></script>
     <link rel="stylesheet" type="text/css" href="../static/styles/profile.css"/>
 </head>
+
+<header> 
+    <button id="returntomain"><a href="/mainpage/">Return to Main page</a></button>
+</header>
 <body>
     <div class="profile">
         <!--Icons made by <a href="https://www.flaticon.com/authors/vitaly-gorbachev" 
             title="Vitaly Gorbachev">Vitaly Gorbachev</a> from <a href="https://www.flaticon.com/" 
             title="Flaticon"> www.flaticon.com</a> -->
         <img src="../static/userIcon/{{ profileData.icon }}" width="150px" height="150px" >
+        <br>
         <a href="../editprofile"><button id="profileIcons">Edit profile</button></a>
         <h1 id="username">{{ profileData.username }}</h1>
         <h2>Name: {{ profileData.name }}</h2>
         <h2>Email: {{ profileData.email }}</h2>
+        <button id="inboxbtn"> <a href="/inbox/">View pending invitations and sent requests</a></button> 
     </div>
     
     
@@ -86,9 +92,9 @@
         
     </div>
 
-    <footer>
+    <!-- <footer>
         <a href="/mainpage/">Return to Main page</a>
-    </footer>
+    </footer> -->
     
 </body>
 </html>

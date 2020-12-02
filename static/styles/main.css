@@ -182,6 +182,11 @@ div input[type=submit] {
     background-color: grey;
 }
 
+.sel-game-btn {
+    outline: none;
+}
+
+
 
 /*Page Layout*/
 div {
