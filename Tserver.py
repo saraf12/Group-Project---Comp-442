@@ -648,10 +648,8 @@ def post_create_game_cat():
                 FOREIGN KEY (username1) REFERENCES Users(id),
                 FOREIGN KEY (username2) REFERENCES Users(id)
             );
-            ''').format(gameToAdd)
+            '''.format(gameToAdd))
     
     regdb.commit()
-
-    return render_template("blank_main.html")
-
-    
+    flash(f"Game has been added")
+    return redirect(url_for("get_admin_dashboard"))    
