@@ -144,7 +144,6 @@ def check_password(pwd, b64ph, pep):
 def get_register():
     return render_template("registerPage.html")
 
-@app.route("/")
 @app.route("/signin/", methods=["GET"])
 def get_signin():
     session['uid'] = ""
@@ -228,7 +227,7 @@ def post_signin():
         print_exc()
         return redirect(url_for("get_signin"))
 
-
+@app.route("/")
 @app.route("/mainpage/", methods=["GET"])
 def get_main_page():
     curr_uid = session.get("uid")

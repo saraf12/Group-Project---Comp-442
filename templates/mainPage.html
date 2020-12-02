@@ -19,11 +19,13 @@
     <!-- Main header, common across all pages -->
     <header>
       <!-- <div class="flex-container" id="title-profile"> -->
-        <div>
-        <a href="../profilepage">
-          <img id="profile" src="../static/userIcon/{{ profileData.icon }}">
-        </a>
-        <a href="../signin">Log out</a>
+        <div class="header">
+          <div id="profileicon">
+          <a href="../profilepage">
+            <img id="profile" src="../static/userIcon/{{ profileData.icon }}">
+          </a>
+          </div>
+          <a id="logout" href="../signin">Log out</a>
         </div>
         <h1 id="title">Third-Party Game Matchmaking</h1>
       <!---Drop down menu nav bar option-->

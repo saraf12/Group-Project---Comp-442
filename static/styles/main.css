@@ -90,6 +90,27 @@ h1 {
 
 }
 
+/* Header */
+#profileicon {
+    position: absolute;
+    right: 20px;
+}
+
+#logout {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
+
+a { 
+    color: black;
+}
+
+a:hover { 
+    color: #24abbd;
+}
+
+
 
 /* div ul li button {
     text-decoration: none;
@@ -123,12 +144,12 @@ div input[type=submit] {
 } */
 
 #profile {
-    position: absolute;
+    /* position: absolute; */
     align-content: right;
     border: black;
     width: 5rem; 
     height: 5rem;
-    right: 20px;
+    /* right: 20px; */
     padding: 1rem;
 }
 
@@ -199,7 +220,7 @@ h1 {
 .match-btn {
     background-color: #ffa07a;
     width: 50rem;
-    height: 20rem;
+    height: 10rem;
     text-align: center;
     font-size: xx-large;
 }
