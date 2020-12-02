@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <!-- Bootstraps -->
+        <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://kit.fontawesome.com/db6a3a4fde.js" crossorigin="anonymous"></script>
+
+        <!-- --> 
+        <link rel="stylesheet" type="text/css" href="../static/styles/admin.css"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" 
+        integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous">
+        
+    </head>
+
+    <body>
+        <div class = "container">
+            <div class = "header">
+                <h2> Admin Page </h2>
+            </div>
+            
+            <form class = "form" id = "form" method = "post" action = "/admin" >
+                <small>             
+                    {% for messages in get_flashed_messages() %}
+                        {{messages}}
+                    {% endfor %} 
+                </small>
+                <div class = "form-control success">
+                    <label> Username </label>
+                    <input type = "text" id = "username" name = "username">
+
+                    <i class = "fas fa-check-circle"></i>
+                    <!-- <i class = "fas fa-exclamation-circle"></i> -->
+                </div>
+
+                <div class = "form-control error">
+                    <label> Password </label>
+                    <input type = "password" id = "password" name = "password">
+
+                    <!-- <i class = "fas fa-check-circle"></i> -->
+                    <i class = "fas fa-exclamation-circle"></i> 
+                </div>
+                
+                <button type = "submit" formmethod="POST"> Submit </button>
+            </form>
+        </div>
+    </body>
+</html>
