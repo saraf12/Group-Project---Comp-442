@@ -548,8 +548,17 @@ def get_admin_dashboard():
     games = c.execute('SELECT name FROM Games').fetchall()
 
     for g in games:
-        conflicted = c.execute('SELECT * FROM {} WHERE status=?'.format(g), ("Conflicted",)).fetchall()
-        conflictedList[g] = conflicted
+        cId = c.execute('SELECT id FROM {} WHERE status=?'.format(g), ("Conflicted",)).fetchall()
+        conflicList =[]      
+        for id in cId:
+            conflicted = dict()
+            conflicted["user1"] = c.execute('SELECT username1 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicted["user2"] = c.execute('SELECT username2 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicted["winnerAccordingToU1"] = c.execute('SELECT winnerAccordingToU1 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicted["winnerAccordingToU2"] = c.execute('SELECT winnerAccordingToU2 FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicted["status"] = c.execute('SELECT status FROM {} WHERE id=?'.format(g), (id,)).fetchone()
+            conflicList.append(conflicted)
+        conflictedList[g] = conflicList
     #############################
 
     return render_template("SadminDash.html", Users=Users, Matches=Matches, games=games, conflict= conflictedList)

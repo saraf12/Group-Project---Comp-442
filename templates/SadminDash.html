@@ -102,14 +102,13 @@
             <th>winnerAccordingToU2</th>
             <th>status</th>
         </tr>
-
         {% for match in conflict[g] %}        
         <tr>
-            <td>match.username1</td>
-            <td>mtahc.username2</td>
-            <td>match.winnerAccordingToU1</td>
-            <td>match.winnerAccordingToU2</td>
-            <td>match.status</td>
+            <td>{{match.user1}}</td>
+            <td>{{match.user2}}</td>
+            <td>{{match.winnerAccordingToU1}}</td>
+            <td>{{match.winnerAccordingToU2}}</td>
+            <td>{{match.status}}</td>
             <td><button>Submit</button></td>
         </tr>
         {% endfor %}
