@@ -261,7 +261,6 @@ def post_ban_user():
 
     for field in fields:
         data[field] = request.form.get(field)
-        print(f"{data}")
 
     print(f"{data}")
     c.execute(''' Delete FROM Users where id = ?;''', (data['id'],))
