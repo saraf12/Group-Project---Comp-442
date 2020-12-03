@@ -268,7 +268,6 @@ def get_main_page():
         gameOptions[game[0]] = game
     
 
-    ############## NOT WORKING ######################################
     # Getting leaderboard info for each game
     UserLists = dict()
     gmsCursor = get_db().cursor()
