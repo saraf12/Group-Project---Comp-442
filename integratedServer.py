@@ -104,7 +104,7 @@ conn.commit()
 #             ''')
 
 # c.execute('''
-#             DELETE FROM Games where id = 1 or id = 2;
+#             DELETE FROM Users where id = 5;
 #             ''')
 
 # c.execute('''
@@ -190,6 +190,15 @@ def post_register():
 
         c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
             (data['username'], data['name'], data['email'], h, data['Iprofile']))
+
+        regdb.commit()
+
+        userId = c.execute('SELECT id FROM Users WHERE username=?;', (data['username'],)).fetchone()[0]
+
+        gmsCursor = get_db().cursor()
+        allgms = gmsCursor.execute('SELECT id, name FROM Games;').fetchall()
+        for gm in allgms:
+            c.execute('''INSERT INTO Stats (user, game) VALUES(?,?);''', (userId,gm[0],))
 
         regdb.commit()
 
