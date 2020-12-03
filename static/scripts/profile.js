@@ -51,7 +51,7 @@ function showRecord(){
 //     //newWin.document.write("Hello, world!");
 // }
 
-function showRecords(evt, games){
+function gamesTab(evt, games){
     var i, tabcontent, tablinks;
   tabcontent = document.getElementsByClassName("recordInfo");
   for (i = 0; i < tabcontent.length; i++) {
