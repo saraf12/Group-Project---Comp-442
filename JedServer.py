@@ -228,12 +228,46 @@ def change_win_loss():
     changedb.commit()
     return redirect(url_for("change_win_loss"))
 
-@app.route("/block_user/", methods = ["POST"])
-def block_user():
+@app.route("/ban_user/", methods = ["GET"])
+def get_ban_user():
     changedb = get_db()
     c = get_db().cursor()
 
+    x = 1
+    data = dict()
+    copy = dict()
+
+    fields = ['id'];
+
+    c.execute('''
+            SELECT id FROM Users;
+            ''')
+
+    for r in c:
+        data[f"{x}"] = r
+        x = x + 1
+
+    print(f"{data}")
     changedb.commit()
+    return render_template("ban_user.html", data = data)
+
+@app.route("/ban_user/", methods = ["POST"])
+def post_ban_user():
+    changedb = get_db()
+    c = get_db().cursor()
+
+    fields = ['id'];
+    data = dict()
+
+    for field in fields:
+        data[field] = request.form.get(field)
+        print(f"{data}")
+
+    print(f"{data}")
+    c.execute(''' Delete FROM Users where id = ?;''', (data['id'],))
+
+    changedb.commit()
+    return redirect(url_for("post_ban_user"))
 
 if __name__ == '__main__':
     app.run(debug=True)
