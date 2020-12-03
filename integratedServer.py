@@ -204,6 +204,8 @@ def post_signin():
     try: 
         username = request.form.get('username')
         passwordtxt = request.form.get('password')
+        if username == "admin":
+            return redirect(url_for("get_admin"))
 
         password = hash_password(passwordtxt, pep)
 
@@ -226,6 +228,47 @@ def post_signin():
         flash("User does not exist")
         print_exc()
         return redirect(url_for("get_signin"))
+
+@app.route("/admin/", methods = ["GET"])
+def get_admin():
+    return render_template("admin.html")
+
+
+@app.route("/admin/", methods = ["POST"])
+def post_admin():
+
+    fields = ['username', 'password']
+
+    data = dict()
+
+    for field in fields:
+        data[field] = request.form.get(field)
+    
+    print(f"{data}")
+    valid = True
+    
+    if data['username'] is None or data['username'] == "" and data['password'] is None or data['password'] == "":
+        valid = False
+        flash("Username & Password cannot be blank")
+        return redirect(url_for("get_admin"))
+
+    if data['username'] is None or data['username'] == "":
+        valid = False
+        flash("Username cannot be blank")
+        return redirect(url_for("get_admin"))
+
+    if data['password'] is None or data['password'] == "":
+        valid = False
+        flash("Password cannot be blank")
+        return redirect(url_for("get_admin"))
+
+    if data['password'] != "":
+        if len(data['password']) < 8:
+            valid = False
+            flash("password must be at least 8 characters")
+            return redirect(url_for("get_admin"))
+
+    return redirect(url_for('get_admin_dashboard'))
 
 @app.route("/")
 @app.route("/mainpage/", methods=["GET"])
@@ -592,10 +635,10 @@ def post_inbox():
 
 @app.route("/admin_dashboard/", methods = ["GET"])
 def get_admin_dashboard():
-    curr_uid = session.get("uid")
-    if curr_uid == "":
-        flash("Please sign in")
-        return redirect(url_for("get_signin"))
+    # curr_uid = session.get("uid")
+    # if curr_uid == "":
+    #     flash("Please sign in")
+    #     return redirect(url_for("get_signin"))
     regdb = get_db()
     c = get_db().cursor()
 
@@ -659,6 +702,51 @@ def post__admin_dashboard():
 
     regdb.commit()
     return redirect(url_for("get_admin_dashboard"))
+
+@app.route("/win_loss/", methods = ["GET"])
+def get_win_loss():
+    changedb = get_db()
+    c = get_db().cursor()
+
+    x = 1
+    data = dict()
+
+    c.execute('''
+            SELECT id FROM Users;
+                ''')
+    for r in c:
+        data[f"{x}"] = r
+        x = x + 1
+        
+    print(f"{data}")
+    
+    changedb.commit()
+    return render_template("win_loss.html", data = data)
+
+@app.route("/win_loss/", methods = ["POST"])
+def change_win_loss():
+    changedb = get_db()
+    c = get_db().cursor()
+
+    data = dict()
+    copy = dict()
+
+    fields = ['id', 'win', 'loss'];
+
+    for field in fields:
+        data[field] = request.form.get(field)
+        print(f"{data}")
+
+    print(f"{data}")
+
+    c.execute(''' Update Stats
+                SET wins = ?, losses = ?
+                WHERE id = ?;
+             ''',(data['win'], data['loss'], data['id'],))
+
+    data.clear()
+    changedb.commit()
+    return redirect(url_for("change_win_loss"))
 
 
 @app.route("/admin_create_game/", methods = ["POST"])
