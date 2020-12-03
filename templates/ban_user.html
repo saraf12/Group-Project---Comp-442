@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <title> Match Declined </title>
+        <script src = "test.js"> </script>
+    </head>
+
+    <body>
+        <small>             
+            {% for messages in get_flashed_messages() %}
+                {{messages}}
+            {% endfor %} 
+        </small>
+        
+        {% for r in data %}
+            <form class = "form" id = "form" method = "post" action = "/ban_user">
+                <div>
+                    {% set id = r %}
+                    <p> Id: {{ id }} </p>
+                    <input type = "hidden" name = "id" value = "{{r}}">
+                    <button type = "submit" formmethod="POST"> Ban </button>
+                </div>
+            </form>
+        {% endfor %}
+    </body>
+</html>
