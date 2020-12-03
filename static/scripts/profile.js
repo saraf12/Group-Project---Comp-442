@@ -2,24 +2,25 @@ window.addEventListener("DOMContentLoaded", function() {
     let recordBtn = document.getElementById("recordBtn");
     recordBtn.addEventListener("click", showRecord);
 
-    let submitBtn = document.getElementsByName("submitRecord");
-    var len = submitBtn.length;
-    for(var i = 0; i < len; i++){
-        submitBtn[i].addEventListener("click", submitRecord);
-    }
+    // let submitBtn = document.getElementsByName("submitRecord");
+    // var len = submitBtn.length;
+    // for(var i = 0; i < len; i++){
+    //     submitBtn[i].addEventListener("click", submitRecord);
+    // }
     
-    let iconBtn = document.getElementById("profileIcons");
-    iconBtn.addEventListener("click", editProfile);
+    // let iconBtn = document.getElementById("profileIcons");
+    // iconBtn.addEventListener("click", editProfile);
 });
 
 function showRecord(){
     let table = document.getElementById("recordTable");
-    if(table.style.display === "none"){
+
+    if(table.style.display === ""){
         console.log("B");
         table.style.display = "block";
     }else{
         console.log("N");
-        table.style.display = "none";
+        table.style.display = "";
     }
 }
 
