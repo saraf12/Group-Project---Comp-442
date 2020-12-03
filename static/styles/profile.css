@@ -38,7 +38,7 @@ button{
 #recordTable{
     display: none; 
     background-color:darkgray;
-    width: 23%; 
+    width: 28%; 
     overflow: auto;
     border: 1px solid black;
 }

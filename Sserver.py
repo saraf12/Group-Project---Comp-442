@@ -320,8 +320,8 @@ def profile_page():
     for game in gamesName:
 
         #for Get records from each match
-        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND status=?'.format(game),
-                    (profileData['username'],profileData['username'],"Confirmed",)).fetchall()
+        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND (status=? OR status=?)'.format(game),
+                    (profileData['username'],profileData['username'],"Confirmed","Done",)).fetchall()
         recordList = []
         for mId in matchesId:
             match = dict()
