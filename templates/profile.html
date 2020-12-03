@@ -56,7 +56,7 @@
                    
                 {% for match in gamesRecords[g] %}
                     <tr>
-                        <th colspan="3">
+                        <th colspan="4">
                             <p>{{match.username}}</p>
                         </th>
                     </tr>
@@ -75,7 +75,14 @@
                             <label>Win</label><br>
                             <input type="radio" name="result" value="{{match.username}}">
                             <label>Loss</label>
+                            
                             <input type="hidden" name="opponent" value="{{match.username}}">
+                        </td>
+                        <td>
+                            <input type="radio" name="result" value="NeverPlayed">
+                            <label>Never Played</label><br>
+                            <!-- <input type="checkbox" name="cancel" value="NeverPlayed">
+                            <label>Never Played</label> -->
                         </td>
                         <td><button type="submit" formmethod="post" name="submitRecord" >Submit</button></td>
                         {% endif %}
@@ -83,12 +90,25 @@
                         <td>
                             <input type="hidden" name="matchId" value="{{match.id}}">
                             <input type="hidden" name="user" value="{{match.user}}">
+
+                            {% if match.win == 0 %}
+                            <input type="radio" name="result" value="{{match.c_username}}" checked disabled>
+                            <label>Win</label><br>
+                            <input type="radio" name="result" value="{{match.username}}" disabled>
+                            <label>Loss</label>
+                            {% elif match.win == 1 %}
+                            <input type="radio" name="result" value="{{match.c_username}}" disabled>
+                            <label>Win</label><br>
+                            <input type="radio" name="result" value="{{match.username}}" checked disabled>
+                            <label>Loss</label>
+                            {% else %}
                             <input type="radio" name="result" value="{{match.c_username}}" disabled>
                             <label>Win</label><br>
                             <input type="radio" name="result" value="{{match.username}}" disabled>
                             <label>Loss</label>
+                            {% endif %}
                         </td>
-                        <td><button type="submit" formmethod="post" style="background-color: blanchedalmond;" name="submitRecord" disabled >Submit</button></td>
+                        <!-- <td><button type="submit" formmethod="post" style="background-color: blanchedalmond;" name="submitRecord" disabled >Submit</button></td> -->
                         {% endif %}
 
                     </form>

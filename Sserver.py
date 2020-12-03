@@ -320,8 +320,8 @@ def profile_page():
     for game in gamesName:
 
         #for Get records from each match
-        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND status=?'.format(game),
-                    (profileData['username'],profileData['username'],"Confirmed",)).fetchall()
+        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND (status=? OR status=?)'.format(game),
+                    (profileData['username'],profileData['username'],"Confirmed","Done",)).fetchall()
         recordList = []
         for mId in matchesId:
             match = dict()
@@ -346,6 +346,12 @@ def profile_page():
                 match['response'] = 0
             else:
                 match['response'] = 1
+                if resp == profileData['username']:
+                    match['win'] = 0
+                elif resp == match['username']:
+                    match['win'] = 1
+                else:
+                    match['win'] = None
             recordList.append(match)
 
         gamesRecords[game] = recordList
@@ -375,10 +381,11 @@ def updaterecord():
     if len(r) > 0:
         result = r[0]
         if(user == 1):
-            otherResult = c.execute('SELECT winnerAccordingToU2 FROM {} WHERE id=?;'.format(game),(matchId,)).fetchone()
+            otherResult = c.execute('SELECT winnerAccordingToU2 FROM {} WHERE id=?;'.format(game),(matchId,)).fetchone()[0]
             c.execute('UPDATE {} SET winnerAccordingToU1 =? WHERE id =?;'.format(game),(result, matchId))
             #If all result is reported check if they match
-            if otherResult is not None:
+            if not (otherResult is None):
+                print(otherResult is None)
                 if result != otherResult:
                     c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Conflicted", matchId))
                 else:
@@ -387,8 +394,9 @@ def updaterecord():
             otherResult = c.execute('SELECT winnerAccordingToU1 FROM {} WHERE id=?;'.format(game),(matchId,)).fetchone()
             c.execute('UPDATE {} SET winnerAccordingToU2 =? WHERE id =?;'.format(game),(result, matchId))
             #If all result is reported check if they match
-            if otherResult is not None:
+            if not (otherResult is None):
                 if result != otherResult:
+                    print(otherResult is None)
                     c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Conflicted", matchId))
                 else:
                     c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Done", matchId))
