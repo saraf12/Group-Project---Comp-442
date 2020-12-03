@@ -5,7 +5,7 @@ Group Member:
     Jedidiah Madubuko
 
 Overview:
-    Website matches up opponents who want to play a particular game.  The actual nature of the game doesn’t matter because the  website does not host the game, but only creates the matchups for players who are seeking an opponent.  Weinclude functionality that lets users specify which game they would like to play, and they would only be matched up with other players of about the same level. The website will pair up players and let them record the result after the game is played. The players are also free so accept aor decline a matchup.
+    Website matches up opponents who want to play a particular game.  The actual nature of the game doesn’t matter because the website does not host the game, but only creates the matchups for players who are seeking an opponent.  We include functionality that lets users specify which game they would like to play, and they would only be matched up with other players of about the same level. The website will pair up players and let them record the result after the game is played. The players are also free to accept or decline a matchup.
 
 Unfinished requirement:
     -A user has a limited amount of time to input a result of a match.  This time is from when the match is first set up. 
