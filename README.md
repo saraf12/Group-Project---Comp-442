@@ -17,4 +17,7 @@ Unfinished requirement:
   #   -Implemented new library ajax??????????????????????
 
 How to run website:
-    ...
+    -set FLASK_APP=integratedServer.py
+    -python -m flask run
+
+    -User signin using the signInPage.html or choose to create an account
