@@ -2,6 +2,7 @@ import sqlite3
 import os
 import base64
 import time
+import decimal
 from datetime import datetime, timedelta
 from traceback import print_exc
 from cryptography.fernet import Fernet
@@ -32,7 +33,7 @@ conn = sqlite3.connect(dbpath)
 c = conn.cursor()
 
 # c.execute('''
-#             DROP TABLE IF EXISTS Games;
+#             DROP TABLE IF EXISTS Snake;
 #             ''')
 
 
@@ -108,7 +109,11 @@ conn.commit()
 #             ''')
 
 # c.execute('''
-#             UPDATE TicTacToe SET status="Requested" WHERE id=1;
+#             UPDATE Stats SET performanceRating="1200" WHERE id=4;
+#             ''')
+
+# c.execute('''
+#             UPDATE TicTacToe SET winnerAccordingToU2=NULL WHERE id=1;
 #             ''')
 
 conn.commit()
@@ -263,7 +268,6 @@ def get_main_page():
         gameOptions[game[0]] = game
     
 
-    ############## NOT WORKING ######################################
     # Getting leaderboard info for each game
     UserLists = dict()
     gmsCursor = get_db().cursor()
@@ -314,55 +318,100 @@ def profile_page():
    #Get records
     regdb.row_factory = lambda cursor, row: row[0]
     c = regdb.cursor()
-    recordList = []
-    # NOTE: Need to change this get it from all games tables
-    matchesId = c.execute('SELECT id FROM Matches WHERE username1 =? OR username2=?',
-                (profileData['username'],profileData['username'],)).fetchall()
     
-    for mId in matchesId:
-        match = dict()
-        match["id"] = mId
-        match['c_username'] = profileData['username']
-        resp = ""
-        username1 = c.execute('SELECT username1 FROM Matches WHERE id = ?',(mId,)).fetchone()
-        username2 = c.execute('SELECT username2 FROM Matches WHERE id = ?', (mId,)).fetchone()
-        if(username1 == profileData['username']):
-            match['user'] = 1
-            match['username'] = username2
-            match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username2,)).fetchone()
-            resp = c.execute('SELECT response1 FROM Matches WHERE id=?',(mId,)).fetchone()
-        else:
-            match['user'] = 2
-            match['username'] = username1
-            match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username1,)).fetchone()
-            resp = c.execute('SELECT response2 FROM Matches WHERE id=?',(mId,)).fetchone()
+    # NOTE: Need to change this get it from all games tables
+    gamesRecords = dict()
+    gameStats = dict()
+    #For each game get Game name 
+    gamesName = c.execute('SELECT name FROM Games').fetchall()
 
-        if(resp == None):
-            match['response'] = 0
-        else:
-            match['response'] = 1
-        recordList.append(match)
+    for game in gamesName:
 
+        #for Get records from each match
+        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND status=?'.format(game),
+                    (profileData['username'],profileData['username'],"Confirmed",)).fetchall()
+        recordList = []
+        for mId in matchesId:
+            match = dict()
+            #match["game"] = game
+            match["id"] = mId
+            match['c_username'] = profileData['username']
+            resp = ""
+            username1 = c.execute('SELECT username1 FROM {} WHERE id = ?'.format(game),(mId,)).fetchone()
+            username2 = c.execute('SELECT username2 FROM {} WHERE id = ?'.format(game), (mId,)).fetchone()
+            if(username1 == profileData['username']):
+                match['user'] = 1
+                match['username'] = username2
+                match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username2,)).fetchone()
+                resp = c.execute('SELECT winnerAccordingToU1 FROM {} WHERE id=?'.format(game),(mId,)).fetchone()
+            else:
+                match['user'] = 2
+                match['username'] = username1
+                match['icon'] = c.execute('SELECT icon FROM Users WHERE username =?', (username1,)).fetchone()
+                resp = c.execute('SELECT winnerAccordingToU2 FROM {} WHERE id=?'.format(game),(mId,)).fetchone()
 
-    return render_template("profilePage.html", profileData=profileData, records = recordList)
+            if(resp == None):
+                match['response'] = 0
+            else:
+                match['response'] = 1
+            recordList.append(match)
 
+        gamesRecords[game] = recordList
+        
+        #Get player state per game
+        stats = dict()
+        gameID = c.execute('SELECT id FROM Games WHERE name=?',(game,)).fetchone()
+        stats["performance"] = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        stats["wins"] = c.execute('SELECT wins FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        stats["losses"] = c.execute('SELECT losses FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        gameStats[game] = stats
+
+    return render_template("profile.html", profileData=profileData,gameStats=gameStats, gamesRecords = gamesRecords, gameslst = gamesName)
 
 
 @app.route("/profilepage/", methods=["POST"])
 def updaterecord():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    game = request.form['game']
     matchId = request.form['matchId']
     name = "result" + str(matchId)
     r = request.form.getlist('result')
+    opponentUsername = request.form.get('opponent')
     user = int(request.form['user'])
     regdb = get_db()
     c = get_db().cursor()
-    c.execute('UPDATE Matches SET response1 =? WHERE id =?;',("Done", 1))
+    currUsername = c.execute('SELECT username FROM Users WHERE id=?',(curr_uid,)).fetchone()[0]
     if len(r) > 0:
         result = r[0]
         if(user == 1):
-            c.execute('UPDATE Matches SET response1 =? WHERE id =?;',(result, matchId))
+            c.execute('UPDATE {} SET winnerAccordingToU1 =? WHERE id =?;'.format(game),(result, matchId,))
         else:
-            c.execute('UPDATE Matches SET response2 =? WHERE id =?;',(result, matchId))
+            c.execute('UPDATE {} SET winnerAccordingToU2 =? WHERE id =?;'.format(game),(result, matchId,))
+        #Code to increment wins or losses and total Games
+        if result == currUsername:
+            c.execute('UPDATE Stats SET wins = wins+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
+            #Code to update performanceRating
+            opponentUserId = c.execute('SELECT id FROM Users WHERE username=?;',(opponentUsername,)).fetchone()[0]
+            opponentPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(opponentUserId, matchId,)).fetchone()[0]
+            additionToPR = decimal.Decimal(opponentPR) * decimal.Decimal(0.25)
+            currentUserPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(curr_uid, matchId,)).fetchone()[0]
+            newPR = additionToPR + currentUserPR
+            newPR = str(newPR)
+            c.execute('UPDATE Stats SET performanceRating=? WHERE user=? AND game=?;',(newPR, curr_uid, matchId,))
+        else:
+            c.execute('UPDATE Stats SET losses = losses+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
+            #Code to update performanceRating
+            opponentUserId = c.execute('SELECT id FROM Users WHERE username=?;',(opponentUsername,)).fetchone()[0]
+            opponentPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(opponentUserId, matchId,)).fetchone()[0]
+            additionToPR = decimal.Decimal(opponentPR) * decimal.Decimal(0.25)
+            currentUserPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(curr_uid, matchId,)).fetchone()[0]
+            newPR = additionToPR + currentUserPR
+            newPR = str(newPR)
+            c.execute('UPDATE Stats SET performanceRating=? WHERE user=? AND game=?;',(newPR, curr_uid, matchId,))
+        c.execute('UPDATE Stats SET totGamesPlayed = totGamesPlayed+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
 
     regdb.commit()
     return redirect(url_for("profile_page"))
@@ -446,8 +495,8 @@ def get_matchup_window(gametype):
                                                     (curr_uid, gametype,)).fetchone()[0]
 
     # DON'T WORK RIGHT NOW BECAUSE DON'T HAVE PERFORMANCE RATING SCHEMA SET YET
-    lowerLimit = currUserData['performanceRating'] - 200
-    upperLimit = currUserData['performanceRating'] + 200
+    lowerLimit = currUserData['performanceRating'] - 1200
+    upperLimit = currUserData['performanceRating'] + 1200
 
     opponentData = c.execute('''SELECT username, email, performanceRating 
                                                     FROM Stats JOIN Users ON Stats.user=Users.id
@@ -648,10 +697,12 @@ def post_create_game_cat():
                 FOREIGN KEY (username1) REFERENCES Users(id),
                 FOREIGN KEY (username2) REFERENCES Users(id)
             );
-            ''').format(gameToAdd)
+            '''.format(gameToAdd))
+    
+    c.execute('''
+            INSERT INTO Games (name) VALUES (?);
+            ''',(gameToAdd,))
     
     regdb.commit()
-
-    return render_template("blank_main.html")
-
-    
+    flash(f"Game has been added")
+    return redirect(url_for("get_admin_dashboard"))    

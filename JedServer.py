@@ -6,14 +6,14 @@ from datetime import datetime, timedelta
 from traceback import print_exc
 #from cryptography.fernet import Fernet
 #from passlib.hash import bcrypt_sha256
-from flask import Flask, render_template, request, redirect, url_for, abort, session, flash, g, jsonify, make_response
+from flask import Flask, render_template, request, redirect, url_for, abort, session, flash, g, jsonify, make_response, json
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config["SECRET_KEY"] = "correcthorsebatterystaple"
 
 scriptdir = os.path.dirname(__file__)
 
-dbpath = os.path.join(scriptdir, "Jedidiah.sqlite3")
+dbpath = os.path.join(scriptdir, "matchingsite.sqlite3")
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -141,14 +141,19 @@ def get_admin_dashboard():
     return render_template("blank_main.html")
 
 @app.route("/admin_dashboard/", methods = ["POST"])
-def post_admin_dashboard():
+def create_game():
     admindb = get_db()
     c = get_db().cursor()
 
-    game_name = request.form.get('game_name')
+    gameToAdd = request.form.get('gamename')
 
-    r = c.execute(f'''
-        CREATE TABLE IF NOT EXISTS game_name = "{game_name}" (
+    alreadyExists = c.execute('SELECT id, name FROM Games WHERE name=?',(gameToAdd,)).fetchone()
+    if alreadyExists:
+        flash(f"Game category entered already exists")
+        return redirect(url_for("get_admin_dashboard"))
+    
+    c.execute('''
+            CREATE TABLE IF NOT EXISTS {} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username1 TEXT,
                 username2 TEXT,
@@ -159,10 +164,76 @@ def post_admin_dashboard():
                 FOREIGN KEY (username1) REFERENCES Users(id),
                 FOREIGN KEY (username2) REFERENCES Users(id)
             );
-                     ''')
+            ''').format(gameToAdd)
+    
+    admindb.commit()
+    return redirect(url_for("get_admin_dashboard"))
+
+@app.route("/admin_dashboard/", methods = ["POST"])
+def delete_game():
+    admindb = get_db()
+    c = get_db().cursor()
+
+    gameToDelete = request.form.get('gamename')
+
+    c.execute(''' 
+                DROP TABLE {};    
+                 ''').format(gameToDelete)
 
     admindb.commit()
     return redirect(url_for("get_admin_dashboard"))
+
+@app.route("/win_loss/", methods = ["GET"])
+def get_win_loss():
+    changedb = get_db()
+    c = get_db().cursor()
+
+    x = 1
+    data = dict()
+
+    c.execute('''
+            SELECT id FROM Users;
+                ''')
+    for r in c:
+        data[f"{x}"] = r
+        x = x + 1
+        
+    print(f"{data}")
+    
+    changedb.commit()
+    return render_template("win_loss.html", data = data)
+
+@app.route("/win_loss/", methods = ["POST"])
+def change_win_loss():
+    changedb = get_db()
+    c = get_db().cursor()
+
+    data = dict()
+    copy = dict()
+
+    fields = ['id', 'win', 'loss'];
+
+    for field in fields:
+        data[field] = request.form.get(field)
+        print(f"{data}")
+
+    print(f"{data}")
+
+    c.execute(''' Update Stats
+                SET wins = ?, losses = ?
+                WHERE id = ?;
+             ''',(data['win'], data['loss'], data['id'],))
+
+    data.clear()
+    changedb.commit()
+    return redirect(url_for("change_win_loss"))
+
+@app.route("/block_user/", methods = ["POST"])
+def block_user():
+    changedb = get_db()
+    c = get_db().cursor()
+
+    changedb.commit()
 
 if __name__ == '__main__':
     app.run(debug=True)

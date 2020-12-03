@@ -13,6 +13,17 @@
 </head>
 <body>
 
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">
+                &times;
+            </button>
+            {{message}}
+        </div>
+        {% endfor %}
+    </div>
+
     <div>
         <h1 id="title">Create a New Game Category</h1>
     </div>
@@ -85,7 +96,66 @@
 
 	{% else %}
 	<h2>No games have been set up</h2>
-	{% endif %}
+    {% endif %}
+    
+        <!--   ***************************************   -->
+        <h1>Conflicted games</h1>
+        <table class="table">
+            {% for g in games%}
+            <tr>
+                <th style="text-align: center;" colspan="5">{{g}}</th>
+            </tr>
+            <tr>
+                <th>User1</th>
+                <th>User2</th>
+                <th>winnerAccordingToU1</th>
+                <th>winnerAccordingToU2</th>
+                <th>status</th>
+            </tr>
+            {% for match in conflict[g] %}
+            <form action = "http://localhost:5000/admin_dashboard/" method = "POST">   
+                <tr>
+                    <input type="hidden" name="game" value="{{g}}">
+                    <input type="hidden" name="matchID" value="{{match.mId}}">
+                    <td>{{match.user1}}</td>
+                    <td>{{match.user2}}</td>
+                    <!-- <td>{{match.winnerAccordingToU1}}</td> -->
+                    <td>
+                        <select name="winnerByUser1">
+                            <option value="{{match.winnerAccordingToU1}}" selected>{{match.winnerAccordingToU1}}</option>
+                            <option value="{{match.winnerAccordingToU2}}">{{match.winnerAccordingToU2}}</option>
+                        </select>
+                    </td>
+    
+                    <!-- <td>{{match.winnerAccordingToU2}}</td> -->
+                    <td>
+                        <select name="winnerByUser2">
+                            <option value="{{match.winnerAccordingToU1}}">{{match.winnerAccordingToU1}}</option>
+                            <option value="{{match.winnerAccordingToU2}}" selected>{{match.winnerAccordingToU2}}</option>
+                        </select>
+                    </td>
+                    <!-- <td>{{match.status}}</td> -->
+                    <td>
+                        <select name="status">
+                            <option value="{{match.status}}" selected>{{match.status}}</option>
+                            <option value="Done">Done</option>
+                        </select>
+                    </td>
+                    <td><button type="submit" formmethod="post">Submit</button></td>
+                </tr>
+            </form> 
+            {% endfor %}
+            <tr> 
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% endfor %}
+        </table>
+    
+        <!--   ***************************************   -->
 
 	<h3><button class="returnbtn"><a href="/mainpage/">Return to Main Page</a></button></h3>
 </body>

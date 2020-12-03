@@ -115,15 +115,21 @@
               <li>Select game to display leaderboard</li>
             </ul>
         </div>
-        
+    
         {% for game, user in UserList.items() %}
           <div class="lb" id="lb{{ game }}" style="display: none">
             <h2>Leaderboard</h2>
+            {% if user %}
             <ol>
               <li>{{ user[0][0] }} : {{ user[0][1] }}</li>
               <li>{{ user[1][0] }} : {{ user[1][1] }}</li>
               <li>{{ user[2][0] }} : {{ user[2][1] }}</li>
             </ol>
+            {% else %}
+            <ul>
+              <li>No users in this game</li>
+            </ul>
+            {% endif %}
           </div>
         {% endfor %}
         
