@@ -14,7 +14,6 @@ window.addEventListener("DOMContentLoaded", function() {
 
 function showRecord(){
     let table = document.getElementById("recordTable");
-
     if(table.style.display === ""){
         console.log("B");
         table.style.display = "block";
