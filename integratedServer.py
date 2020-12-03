@@ -190,6 +190,7 @@ def post_register():
 
         c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
             (data['username'], data['name'], data['email'], h, data['Iprofile']))
+
         regdb.commit()
 
         return redirect(url_for("get_signin"))
@@ -529,7 +530,11 @@ def get_matchup_window(gametype):
     currUserData['performanceRating'] = c.execute('''SELECT performanceRating 
                                                     FROM Stats
                                                     WHERE user=? and game=?;''',
-                                                    (curr_uid, gametype,)).fetchone()[0]
+                                                    (curr_uid, gametype,)).fetchone()
+    if currUserData['performanceRating'] is not None:
+        currUserData['performanceRating'] = currUserData['performanceRating'][0]
+    else:
+        currUserData['performanceRating'] = 1200
 
     lowerLimit = currUserData['performanceRating'] - 1200
     upperLimit = currUserData['performanceRating'] + 1200
