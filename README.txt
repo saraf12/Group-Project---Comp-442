@@ -13,8 +13,8 @@ Unfinished requirement:
     -If only one user reports a result for the match by the end of the input time, the administrator will receive a notification. 
     -If only one user reports a result for the match, the administrator can update the result for the user who didn’t report to match the result that was reported. 
   #     -The administrator can modify the win/loss record of a member. (ongoing)
-  #     -Stuff about update without refresh????????????????????
-  #     -Implemented new library ajax??????????????????????
+  #     -Implementation of AJAX. (ongoing)
+  #     -Working on react.js (ongoing)
 
 How to run website:
     -set FLASK_APP=integratedServer.py
