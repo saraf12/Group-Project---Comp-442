@@ -138,7 +138,7 @@ def post_admin():
     
 @app.route("/admin_dashboard/", methods = ["GET"])
 def get_admin_dashboard():
-    return render_template("blank_main.html")
+    return render_template("admin_dashboard.html")
 
 @app.route("/admin_dashboard/", methods = ["POST"])
 def create_game():
@@ -261,7 +261,6 @@ def post_ban_user():
 
     for field in fields:
         data[field] = request.form.get(field)
-        print(f"{data}")
 
     print(f"{data}")
     c.execute(''' Delete FROM Users where id = ?;''', (data['id'],))
