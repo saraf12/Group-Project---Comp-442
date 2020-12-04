@@ -138,7 +138,7 @@ def post_admin():
     
 @app.route("/admin_dashboard/", methods = ["GET"])
 def get_admin_dashboard():
-    return render_template("blank_main.html")
+    return render_template("admin_dashboard.html")
 
 @app.route("/admin_dashboard/", methods = ["POST"])
 def create_game():
