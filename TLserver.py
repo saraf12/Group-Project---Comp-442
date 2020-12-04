@@ -396,8 +396,14 @@ def profile_page():
         stats = dict()
         gameID = c.execute('SELECT id FROM Games WHERE name=?',(game,)).fetchone()
         stats["performance"] = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        if stats["performance"] is None:
+            stats["performance"] = 1200
         stats["wins"] = c.execute('SELECT wins FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        if stats["wins"] is None:
+            stats["wins"] = 0
         stats["losses"] = c.execute('SELECT losses FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        if stats["losses"] is None:
+            stats["losses"] = 0
         gameStats[game] = stats
 
     return render_template("profile.html", profileData=profileData,gameStats=gameStats, gamesRecords = gamesRecords, gameslst = gamesName)
