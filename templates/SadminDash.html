@@ -12,6 +12,16 @@
     <link rel="stylesheet" type="text/css" href="../static/styles/inbox.css"/>
 </head>
 <body>
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">
+                &times;
+            </button>
+            {{message}}
+        </div>
+        {% endfor %}
+    </div>
 
     <div>
         <h1 id="title">Create a New Game Category</h1>
