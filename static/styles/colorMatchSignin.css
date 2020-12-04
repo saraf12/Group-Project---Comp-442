@@ -24,6 +24,16 @@ body {
     max-width: 100%;
 }
 
+.container-r {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    width: 400px;
+    height: 650px;
+    max-width: 100%;
+}
+
 .header {
     background-color: #f7f7f7;
     border-bottom: 10px solid #f0f0f0;
@@ -115,4 +125,20 @@ body {
     font-size: small;
     display: inline-block;
     margin-bottom: 5px;
+}
+
+.profile{
+    text-align: center;
+}
+
+.icons{
+    border-radius: 50%;
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 4px 2px;
 }

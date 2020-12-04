@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <title>Sign - Up</title>
+        <!-- Bootstraps 
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <!--  
+        <link rel="stylesheet" type="text/css" href="../static/styles/signin.css"/>
+        -->
+        <link rel="stylesheet" type="text/css" href="../static/styles/colorMatchSignin.css"/>
+        <script src="../static/scripts/icon.js"></script>
+    </head>
+
+    <body>
+        <div class = "container-r">
+            <div class = "header">
+                <h2> Log In </h2>
+            </div>
+            
+            <form class = "form" id = "form" method = "post" action = "/register/" >
+                <small>             
+                    {% for messages in get_flashed_messages() %}
+                        {{messages}}
+                    {% endfor %} 
+                </small>
+
+                <div class = "form-control success">
+                    <label> Username </label>
+                    <input type = "text" id = "username" name = "username">
+
+                    <i class = "fas fa-check-circle"></i>
+                    <!-- <i class = "fas fa-exclamation-circle"></i> -->
+                </div>
+
+                <div class = "form-control success">
+                    <label> Email </label>
+                    <input type = "text" id = "email" name = "email">
+
+                    <i class = "fas fa-check-circle"></i>
+                    <!-- <i class = "fas fa-exclamation-circle"></i> -->
+                </div>
+
+                <div class = "form-control success">
+                    <label> Password </label>
+                    <input type = "password" id = "password" name = "password">
+
+                    <i class = "fas fa-check-circle"></i>
+                    <!-- <i class = "fas fa-exclamation-circle"></i> -->
+                </div>
+
+                <div class = "form-control success">
+                    <label> Confirm Password </label>
+                    <input type = "password" id = "confirm-password" name = "confirm-password">
+
+                    <!-- <i class = "fas fa-check-circle"></i> -->
+                    <i class = "fas fa-exclamation-circle"></i> 
+                </div>
+                
+                <button type = "submit" formmethod="POST"> Submit </button>
+            </form>
+
+            <div class = "footer">
+                <footer>
+                    <a id="createAccountLink" href="/signin"> Have an account? What you doin dawg? </a>
+                </footer>
+            </div>
+        </div>
+    </body>
+</html>
