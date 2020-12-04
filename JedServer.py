@@ -13,7 +13,7 @@ app.config["SECRET_KEY"] = "correcthorsebatterystaple"
 
 scriptdir = os.path.dirname(__file__)
 
-dbpath = os.path.join(scriptdir, "matchingsite.sqlite3")
+dbpath = os.path.join(scriptdir, "Jed01.sqlite3")
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -232,10 +232,10 @@ def post_create_game():
     alreadyExists = c.execute('SELECT id, name FROM Games WHERE name=?',(gameToAdd,)).fetchone()
     if alreadyExists:
         flash(f"Game category entered already exists")
-        return redirect(url_for("get_admin_dashboard"))
+        return redirect(url_for("get_admin_games"))
     
-    c.execute('''
-            CREATE TABLE IF NOT EXISTS {} (
+    c.execute(F'''
+            CREATE TABLE IF NOT EXISTS {gameToAdd} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username1 TEXT,
                 username2 TEXT,
@@ -246,15 +246,15 @@ def post_create_game():
                 FOREIGN KEY (username1) REFERENCES Users(id),
                 FOREIGN KEY (username2) REFERENCES Users(id)
             );
-            ''').format(gameToAdd)
+            ''')
     
     admindb.commit()
-    return redirect(url_for("get_admin_dashboard"))
+    return redirect(url_for("get_admin_games"))
 
 @app.route("/delete_game/", methods = ["GET"])
 def get_delete_game():
     return render_template("admin_dash_games.html")
-    
+
 @app.route("/delete_game/", methods = ["POST"])
 def post_delete_game():
     admindb = get_db()
@@ -267,7 +267,7 @@ def post_delete_game():
                  ''').format(gameToDelete)
 
     admindb.commit()
-    return redirect(url_for("get_admin_dashboard"))
+    return render_template("admin_dash_games.html")
 
 @app.route("/win_loss/", methods = ["GET"])
 def get_win_loss():
