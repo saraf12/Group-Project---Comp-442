@@ -65,7 +65,7 @@
                             <img src="../static/userIcon/{{match.icon}}" width="50px" height="50px">
                         </td>
 
-                    <form action = "http://localhost:5000/profilepage/" method = "POST">
+                    <form action = "/profilepage/" method = "POST">
                         {% if match.response == 0 %}
                         <td>
                             <input type="hidden" name="game" value="{{g}}">

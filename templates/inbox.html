@@ -30,7 +30,7 @@
 				<td>{{ request[0] }}</td>
                 <td>{{ request[1][2] }}</td>
                 <td>
-                    <form action = "http://localhost:5000/inbox/" method = "POST">
+                    <form action = "/inbox/" method = "POST">
                     <button class="responsebtn" type="submit" formmethod="post" name="submit-btn" value="accept"> Accept </button>
                     <button class="responsebtn" type="submit" formmethod="post" name="submit-btn" value="decline"> Decline </button>
                     <input type="hidden" name="gameid" id="gameid" value="{{ request[1][0] }}">
