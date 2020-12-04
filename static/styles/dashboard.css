@@ -11,6 +11,7 @@
   --first-color-light: #AFA5D9;
   --white-color: #F7F6FB;
   --blue-violet: #7a61b7;
+  --blue-violet-light: #d0bdff;
   
   /*===== Font and typography =====*/
   --body-font: 'Nunito', sans-serif;
@@ -224,7 +225,9 @@ a{
   flex-wrap: wrap;
   justify-content: left;
   align-items: center;
+  transition: 1s;
 }
+
 
 .user-card{
   margin: 20px 5px;
@@ -237,7 +240,19 @@ a{
   background: white;
   box-shadow: 0px 0px 25px 1px rgba(50, 50, 50, 0.1);
   animation: appear 500ms ease-out forwards;
+  transition: 1s;
   text-align: center;
+}
+
+.user-card:hover{
+  transform: scale(1.05);
+
+  /*background: var(--blue-violet); */
+  box-shadow: 0px 0px 2px 1px var(--blue-violet-light);
+}
+
+.user-card h1:hover{
+  color: var(--blue-violet);
 }
 
 .user-card h1{
@@ -290,7 +305,20 @@ a{
   background: white;
   box-shadow: 0px 0px 25px 1px rgba(50, 50, 50, 0.1);
   text-align: center;
+  transition: 1s;
 }
+
+.matches-card:hover{
+  transform: scale(1.05);
+  color: var(--blue-violet);
+  /*background: var(--blue-violet); */
+  box-shadow: 0px 0px 2px 1px var(--blue-violet-light);
+} 
+
+.matches-card h1:hover{
+  color: var(--blue-violet);
+}
+
 
 .matches-card h1{
   font-family: 'Lato', sans-serif;
