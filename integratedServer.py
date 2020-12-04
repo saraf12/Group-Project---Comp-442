@@ -283,10 +283,15 @@ def post_admin():
 @app.route("/")
 @app.route("/mainpage/", methods=["GET"])
 def get_main_page():
-    curr_uid = session.get("uid")
-    if curr_uid == "":
+    try:
+        curr_uid = session.get("uid")
+        if curr_uid == "":
+            flash("Please sign in")
+            return redirect(url_for("get_signin"))
+    except:
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
 
     # Code implementing a time frame until user is logged out
     try:
