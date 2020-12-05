@@ -323,6 +323,8 @@ width: 100%;
   transition: all 300ms ease-in-out;
   display: block;
   font-family: 'Nunito', sans-serif;
+  margin-top: 50px;
+  margin-right: 60px;
 }
 
 .edit-btn:hover {
