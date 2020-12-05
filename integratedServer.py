@@ -104,7 +104,7 @@ conn.commit()
 #             ''')
 
 # c.execute('''
-#             DELETE FROM Games where id = 1 or id = 2;
+#             DELETE FROM Users where id = 5;
 #             ''')
 
 # c.execute('''
@@ -190,6 +190,16 @@ def post_register():
 
         c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
             (data['username'], data['name'], data['email'], h, data['Iprofile']))
+
+        regdb.commit()
+
+        userId = c.execute('SELECT id FROM Users WHERE username=?;', (data['username'],)).fetchone()[0]
+
+        gmsCursor = get_db().cursor()
+        allgms = gmsCursor.execute('SELECT id, name FROM Games;').fetchall()
+        for gm in allgms:
+            c.execute('''INSERT INTO Stats (user, game) VALUES(?,?);''', (userId,gm[0],))
+
         regdb.commit()
 
         return redirect(url_for("get_signin"))
@@ -273,10 +283,15 @@ def post_admin():
 @app.route("/")
 @app.route("/mainpage/", methods=["GET"])
 def get_main_page():
-    curr_uid = session.get("uid")
-    if curr_uid == "":
+    try:
+        curr_uid = session.get("uid")
+        if curr_uid == "":
+            flash("Please sign in")
+            return redirect(url_for("get_signin"))
+    except:
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
 
     # Code implementing a time frame until user is logged out
     try:
@@ -529,7 +544,11 @@ def get_matchup_window(gametype):
     currUserData['performanceRating'] = c.execute('''SELECT performanceRating 
                                                     FROM Stats
                                                     WHERE user=? and game=?;''',
-                                                    (curr_uid, gametype,)).fetchone()[0]
+                                                    (curr_uid, gametype,)).fetchone()
+    if currUserData['performanceRating'] is not None:
+        currUserData['performanceRating'] = currUserData['performanceRating'][0]
+    else:
+        currUserData['performanceRating'] = 1200
 
     lowerLimit = currUserData['performanceRating'] - 1200
     upperLimit = currUserData['performanceRating'] + 1200

@@ -12,13 +12,23 @@
     <link rel="stylesheet" type="text/css" href="../static/styles/inbox.css"/>
 </head>
 <body>
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">
+                &times;
+            </button>
+            {{message}}
+        </div>
+        {% endfor %}
+    </div>
 
     <div>
         <h1 id="title">Create a New Game Category</h1>
     </div>
 
     <div class = "m-4 form-group row">            
-    <form action = "http://localhost:5000/admin_create_game/" method = "POST">
+    <form action = "/admin_create_game/" method = "POST">
 
     <div class="col-xs-2">
         <label for = "gamename"> Game Name: </label> 
@@ -103,7 +113,7 @@
             <th>status</th>
         </tr>
         {% for match in conflict[g] %}
-        <form action = "http://localhost:5000/admin_dashboard/" method = "POST">   
+        <form action = "/admin_dashboard/" method = "POST">   
             <tr>
                 <input type="hidden" name="game" value="{{g}}">
                 <input type="hidden" name="matchID" value="{{match.mId}}">

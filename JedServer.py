@@ -4,8 +4,8 @@ import base64
 import time
 from datetime import datetime, timedelta
 from traceback import print_exc
-#from cryptography.fernet import Fernet
-#from passlib.hash import bcrypt_sha256
+from cryptography.fernet import Fernet
+from passlib.hash import bcrypt_sha256
 from flask import Flask, render_template, request, redirect, url_for, abort, session, flash, g, jsonify, make_response, json
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -13,7 +13,7 @@ app.config["SECRET_KEY"] = "correcthorsebatterystaple"
 
 scriptdir = os.path.dirname(__file__)
 
-dbpath = os.path.join(scriptdir, "matchingsite.sqlite3")
+dbpath = os.path.join(scriptdir, "Jed01.sqlite3")
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -73,6 +73,32 @@ c.execute('''
 
 conn.commit()
 
+serverdir = os.path.dirname(__file__)
+pepfile = os.path.join(serverdir, "pepper.bin")
+with open(pepfile, 'rb') as fin:
+    key = fin.read()
+    pep = Fernet(key)
+
+#hash a password (pwd) and user pepper (pep)
+def hash_password(pwd, pep):
+    #compute the 14 round bcrypt hash
+    # of the sha256 hash of the password
+    h = bcrypt_sha256.using(rounds=14).hash(pwd)
+    # encrypt with AES (pepper)
+    ph = pep.encrypt(h.encode('utf-8'))
+    # encode as base64 string and return
+    b64ph = base64.b64encode(ph)
+    return b64ph
+
+#check password and pwd against b64ph
+def check_password(pwd, b64ph, pep):
+    # decode the encrypted base64 hash
+    ph = base64.b64decode(b64ph)
+    # decrypt the hash (remove pepper)
+    h = pep.decrypt(ph)
+    # let passlib check the hash
+    return bcrypt_sha256.verify(pwd, h)
+
 @app.route("/")
 @app.route("/signin/", methods=["GET"])
 def get_signin():
@@ -93,6 +119,57 @@ def post_signin():
     if data['username'] == "admin":
         return redirect(url_for("get_admin"))
     return redirect(url_for("get_admin_dashboard"))
+
+@app.route("/register/", methods=["GET"])
+def get_register():
+    return render_template("register.html")
+
+@app.route("/register/", methods=["POST"])
+def post_register():
+    regdb = get_db()
+    c = get_db().cursor()
+    data = dict()
+    fields = ['username', 'name', 'email', 'password', 'confirm-password', 'Iprofile']
+    for field in fields:
+        data[field] = request.form.get(field)
+    valid = True
+    for field in fields:
+        if data[field] is None or data[field] == "":
+            valid = False
+            flash(f"{field} cannot be blank")
+    if valid and len(data['password']) < 8:
+        valid = False
+        flash("password must be at least 8 characters")
+    if valid and data['password'] != data['confirm-password']:
+        valid = False
+        flash("password and confirm password must match")
+    if valid:
+        session['email'] = data['email']
+
+        uid = c.execute('SELECT id FROM Users WHERE email=?;',(data['email'],)).fetchone()
+
+        # if a user is found, then this email address is taken
+        if uid is not None:
+            flash("An account with this email already exists")
+            return redirect(url_for("get_register"))
+        uid = c.execute('SELECT id FROM Users WHERE username=?;',(data['username'],)).fetchone()
+
+        # if a user is found, then this email address is taken
+        if uid is not None:
+            flash("An account with this username already exists")
+            return redirect(url_for("get_register"))
+        # otherwise add them to the database and redirect to login
+        passtohash = data['password']
+
+        h = hash_password(data['password'], pep)
+
+        c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
+            (data['username'], data['name'], data['email'], h, "you"))
+        regdb.commit()
+
+        return redirect(url_for("get_signin"))
+    else:
+        return redirect(url_for("get_register"))
 
 #22222~~~~~
 @app.route("/admin/", methods = ["GET"])
@@ -138,11 +215,21 @@ def post_admin():
     
 @app.route("/admin_dashboard/", methods = ["GET"])
 def get_admin_dashboard():
-    return render_template("blank_main.html")
+    return render_template("admin_dashboard.html")
 
-@app.route("/admin_dashboard/", methods = ["POST"])
-def create_game():
+@app.route("/create_game/", methods = ["GET"])
+def get_create_game():
+    return render_template("admin_dash_games.html")
+
+
+@app.route("/create_game/", methods = ["POST"])
+def post_create_game():
     admindb = get_db()
+    c = get_db().cursor()
+
+    gameToAdd = request.form.get('gamename')
+
+    regdb = get_db()
     c = get_db().cursor()
 
     gameToAdd = request.form.get('gamename')
@@ -164,13 +251,21 @@ def create_game():
                 FOREIGN KEY (username1) REFERENCES Users(id),
                 FOREIGN KEY (username2) REFERENCES Users(id)
             );
-            ''').format(gameToAdd)
+            '''.format(gameToAdd))
     
-    admindb.commit()
-    return redirect(url_for("get_admin_dashboard"))
+    c.execute('''
+            INSERT INTO Games (name) VALUES (?);
+            ''',(gameToAdd,))
+    
+    regdb.commit()
+    return redirect(url_for("get_admin_games"))
 
-@app.route("/admin_dashboard/", methods = ["POST"])
-def delete_game():
+@app.route("/delete_game/", methods = ["GET"])
+def get_delete_game():
+    return render_template("admin_dash_games.html")
+
+@app.route("/delete_game/", methods = ["POST"])
+def post_delete_game():
     admindb = get_db()
     c = get_db().cursor()
 
@@ -181,7 +276,7 @@ def delete_game():
                  ''').format(gameToDelete)
 
     admindb.commit()
-    return redirect(url_for("get_admin_dashboard"))
+    return render_template("admin_dash_games.html")
 
 @app.route("/win_loss/", methods = ["GET"])
 def get_win_loss():
@@ -261,13 +356,24 @@ def post_ban_user():
 
     for field in fields:
         data[field] = request.form.get(field)
-        print(f"{data}")
 
     print(f"{data}")
     c.execute(''' Delete FROM Users where id = ?;''', (data['id'],))
 
     changedb.commit()
     return redirect(url_for("post_ban_user"))
+
+@app.route("/admin_dashboard_users/", methods = ["GET"])
+def get_admin_user():
+    return render_template("admin_dash_user.html")
+
+@app.route("/admin_dashboard_games/", methods = ["GET"])
+def get_admin_games():
+    return render_template("admin_dash_games.html")
+
+@app.route("/admin_dashboard_matches/", methods = ["GET"])
+def get_admin_matches():
+    return render_template("admin_dash_matches.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
