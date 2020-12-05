@@ -229,13 +229,18 @@ def post_create_game():
 
     gameToAdd = request.form.get('gamename')
 
+    regdb = get_db()
+    c = get_db().cursor()
+
+    gameToAdd = request.form.get('gamename')
+
     alreadyExists = c.execute('SELECT id, name FROM Games WHERE name=?',(gameToAdd,)).fetchone()
     if alreadyExists:
         flash(f"Game category entered already exists")
-        return redirect(url_for("get_admin_games"))
+        return redirect(url_for("get_admin_dashboard"))
     
-    c.execute(F'''
-            CREATE TABLE IF NOT EXISTS {gameToAdd} (
+    c.execute('''
+            CREATE TABLE IF NOT EXISTS {} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username1 TEXT,
                 username2 TEXT,
@@ -246,9 +251,13 @@ def post_create_game():
                 FOREIGN KEY (username1) REFERENCES Users(id),
                 FOREIGN KEY (username2) REFERENCES Users(id)
             );
-            ''')
+            '''.format(gameToAdd))
     
-    admindb.commit()
+    c.execute('''
+            INSERT INTO Games (name) VALUES (?);
+            ''',(gameToAdd,))
+    
+    regdb.commit()
     return redirect(url_for("get_admin_games"))
 
 @app.route("/delete_game/", methods = ["GET"])
