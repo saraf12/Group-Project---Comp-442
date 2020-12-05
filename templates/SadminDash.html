@@ -113,7 +113,7 @@
             <th>status</th>
         </tr>
         {% for match in conflict[g] %}
-        <form action = "http://localhost:5000/admin_dashboard/" method = "POST">   
+        <form action = "/admin_dashboard/" method = "POST">   
             <tr>
                 <input type="hidden" name="game" value="{{g}}">
                 <input type="hidden" name="matchID" value="{{match.mId}}">

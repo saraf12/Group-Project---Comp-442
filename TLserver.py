@@ -396,8 +396,14 @@ def profile_page():
         stats = dict()
         gameID = c.execute('SELECT id FROM Games WHERE name=?',(game,)).fetchone()
         stats["performance"] = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        if stats["performance"] is None:
+            stats["performance"] = 1200
         stats["wins"] = c.execute('SELECT wins FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        if stats["wins"] is None:
+            stats["wins"] = 0
         stats["losses"] = c.execute('SELECT losses FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        if stats["losses"] is None:
+            stats["losses"] = 0
         gameStats[game] = stats
 
     return render_template("profile.html", profileData=profileData,gameStats=gameStats, gamesRecords = gamesRecords, gameslst = gamesName)
@@ -801,4 +807,26 @@ def post_create_game_cat():
     regdb.commit()
     flash(f"Game has been added")
     return redirect(url_for("get_admin_dashboard"))    
-    
+
+@app.route("/testingspace/", methods=["GET"])
+def test_for_ajax():
+    regdb = get_db()
+    c = get_db().cursor()
+    dtObject = c.execute('SELECT dateCreated FROM TicTacToe WHERE id=1;').fetchone()
+    print(dtObject)
+    print("Yup it's running")
+    return (f"Hello")
+
+@app.route("/expiration/", methods=["GET"])
+def get_expiration():
+    gameId = request.form.get('gameid')
+    return render_template("expirationCountdown.html", gameId=gameId)
+
+@app.route("/datecreated/<int:gameid>", methods=["GET"])
+def get_datecreated(gameid):
+    regdb = get_db()
+    c = get_db().cursor()
+    dtObject = c.execute('SELECT dateCreated FROM TicTacToe WHERE id=1;').fetchone()
+    # what is returned if get datetime from sql table: '2020-12-01 23:01:59'
+    dateCreated = '2020-12-01 23:01:59'
+    return jsonify(dateCreated)
