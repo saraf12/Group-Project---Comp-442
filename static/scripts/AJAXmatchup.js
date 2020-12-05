@@ -6,22 +6,56 @@
 // });
 
 var createClock;
-var cnt = 0;
+//ar cnt = 0;
 var callingBtnValue;
 
 function seeCountdown() {
   callingBtnValue = event.target.value;
-  if(cnt == 0) {
+  let container = document.getElementById(callingBtnValue);
+  //console.log(container);
+  let displays = document.getElementsByClassName("expTime")
+  
+  // if(container == displays[0]) {
+  //   console.log("They're equal");
+  // } else {
+  //   console.log("They're not equal");
+  // }
+
+  clearInterval(createClock);
+  console.log(container.style.display);
+  if(container.style.display == "none") {
+    container.style.display = "block";
     createClock = setInterval(newerWay, 1000);
-    cnt = 1;
+    for(let i = 0; i < displays.length; i++) {
+      console.log(displays[i]);
+      if(displays[i] != container){
+        displays[i].style.display = "none";
+      }
+    }
   } else {
-    console.log("Getting into else statement");
-    clearInterval(createClock);
-    //let gameid = document.getElementById("expiration-btn").value;
-    let container = document.getElementById(callingBtnValue);
-    container.innerHTML = "";
-    cnt = 0;
+    container.style.display = "none";
+    clearInterval(createClock)
   }
+
+  //console.log(displays[0]);
+  // if(container.style.display == "block") {
+  //   console.log("Getting into else statement");
+  //   clearInterval(createClock);
+  //   console.log("making it past clearing statement");
+  //   //let gameid = document.getElementById("expiration-btn").value;
+  //   //container.innerHTML = "";
+  //   container.style.display = "none"
+  //   //cnt = 0;
+  // } else {
+  //   createClock = setInterval(newerWay, 1000);
+  //   //cnt = 1;
+  //   container.style.display = "block";
+  //   for(let i = 0; i < displays.length; i++) {
+  //     if (displays[i] != container) {
+  //       displays[i].style.display = "none";
+  //     }
+  //   }
+  // }
 }
 
 function hideCountdown() {
@@ -40,13 +74,13 @@ function displayTime() {
 function refreshCountdown(data) {
   //let gameid = document.getElementById("expiration-btn").value;
   let container = document.getElementById(callingBtnValue);
-  console.log(container);
+  console.log(container.id);
   let oneweek = 604800000;
   let weekFromSetup = Date.parse(data) + oneweek;
   //console.log(weekFromSetup);
 
   let timeTillExpiration = timebetween(Date.parse(new Date()), weekFromSetup);
-  console.log(timeTillExpiration);
+  //console.log(timeTillExpiration);
 
   let trialrun = timebetween(Date.parse(new Date()), Date.parse(data));
   //console.log(trialrun);
@@ -77,8 +111,9 @@ function timebetween(date1, date2) {
 
 
 function newerWay() {
-  let gameid = document.getElementById("expiration-btn").value;
-  console.log("gameid")
+  let gameid = document.getElementById(callingBtnValue).id;
+  //let gameid = document.getElementById("expiration-btn").value;
+  //console.log(gameid)
 fetch(`/datecreated/${gameid}`)
   .then(function (response) {
     if (response.ok) { return response.json(); }

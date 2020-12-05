@@ -87,7 +87,7 @@
                         </td>
                         <td><button type="submit" formmethod="post" name="submitRecord" >Submit</button></td>
                         <td><button onclick="seeCountdown()" id="expiration-btn" type="button" value="{{match.id}}">Time until match expires</button></td>
-                        <td><p id="{{ match.id }}"></p></td>
+                        <td><p class="expTime" id="{{ match.id }}" style="display: none"></p></td>
                         {% endif %}
                         {% if match.response == 1 %}
                         <td>
