@@ -3,6 +3,7 @@
 <head>
 <title>My Profile</title>
     <script src="../static/scripts/profile.js"></script>
+    <script src="../static/scripts/AJAXmatchup.js"></script>
     <link rel="stylesheet" type="text/css" href="../static/styles/profile.css"/>
 </head>
 
@@ -85,6 +86,8 @@
                             <label>Never Played</label> -->
                         </td>
                         <td><button type="submit" formmethod="post" name="submitRecord" >Submit</button></td>
+                        <td><button onclick="seeCountdown()" id="expiration-btn" type="button" value="{{match.id}}">Time until match expires</button></td>
+                        <td><p id="{{ match.id }}"></p></td>
                         {% endif %}
                         {% if match.response == 1 %}
                         <td>
