@@ -44,16 +44,16 @@
                 
                 
                 {% if not gamesRecords[g]%}
-                    <button id="recordBtn" disabled>Update Record</button>
+                    <button id="{{g}}" disabled>Update Record</button>
                     <p>No Record!!!</p>
                     <p>No Games registered</p>
                 
                 {% else %}
-                    <button id="recordBtn">Update Record</button>
+                    <button id="{{g}}"class="recordBtn">Update Record</button>
                 {% endif %}
 
                 <div class="table">
-                <table id="recordTable">
+                <table id="recordTable{{g}}" class="recordTable">
                    
                 {% for match in gamesRecords[g] %}
                     <tr>
