@@ -7,9 +7,23 @@ from traceback import print_exc
 from cryptography.fernet import Fernet
 from passlib.hash import bcrypt_sha256
 from flask import Flask, render_template, request, redirect, url_for, abort, session, flash, g, jsonify, make_response
+from flask_mail import Mail, Message
+
 app = Flask(__name__)
+
+mail_settings = {
+    "MAIL_SERVER": 'smtp.gmail.com',
+    "MAIL_PORT": 465,
+    "MAIL_USE_TLS": False,
+    "MAIL_USE_SSL": True,
+    "MAIL_USERNAME": 'noreplythirdpartymatchmaker@gmail.com',
+    "MAIL_PASSWORD": 'Comp442A'
+}
+app.config.update(mail_settings)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config["SECRET_KEY"] = "correcthorsebatterystaple"
+
+mail = Mail(app)
 
 scriptdir = os.path.dirname(__file__)
 
@@ -32,7 +46,7 @@ conn = sqlite3.connect(dbpath)
 c = conn.cursor()
 
 # c.execute('''
-#             DROP TABLE IF EXISTS Stats;
+#             DROP TABLE IF EXISTS Games;
 #             ''')
 
 
@@ -100,11 +114,15 @@ c.execute('''
 conn.commit()
 
 # c.execute('''
-#             INSERT INTO Stats (user, game, wins, losses, totGamesPlayed) VALUES (3, 2, 3, 3, 6);
+#             INSERT INTO Games (name) VALUES ("MarioKart");
 #             ''')
 
 # c.execute('''
-#             DELETE FROM Stats where id = 5;
+#             DELETE FROM Users where id = 5;
+#             ''')
+
+# c.execute('''
+#             UPDATE TicTacToe SET status="Requested" WHERE id=1;
 #             ''')
 
 conn.commit()
@@ -140,7 +158,6 @@ def check_password(pwd, b64ph, pep):
 def get_register():
     return render_template("registerPage.html")
 
-@app.route("/")
 @app.route("/signin/", methods=["GET"])
 def get_signin():
     session['uid'] = ""
@@ -187,6 +204,16 @@ def post_register():
 
         c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
             (data['username'], data['name'], data['email'], h, data['Iprofile']))
+
+        regdb.commit()
+
+        userId = c.execute('SELECT id FROM Users WHERE username=?;', (data['username'],)).fetchone()[0]
+
+        gmsCursor = get_db().cursor()
+        allgms = gmsCursor.execute('SELECT id, name FROM Games;').fetchall()
+        for gm in allgms:
+            c.execute('''INSERT INTO Stats (user, game) VALUES(?,?);''', (userId,gm[0],))
+
         regdb.commit()
 
         return redirect(url_for("get_signin"))
@@ -201,6 +228,8 @@ def post_signin():
     try: 
         username = request.form.get('username')
         passwordtxt = request.form.get('password')
+        if username == "admin":
+            return redirect(url_for("get_admin"))
 
         password = hash_password(passwordtxt, pep)
 
@@ -224,11 +253,56 @@ def post_signin():
         print_exc()
         return redirect(url_for("get_signin"))
 
+@app.route("/admin/", methods = ["GET"])
+def get_admin():
+    return render_template("admin.html")
 
+
+@app.route("/admin/", methods = ["POST"])
+def post_admin():
+
+    fields = ['username', 'password']
+
+    data = dict()
+
+    for field in fields:
+        data[field] = request.form.get(field)
+    
+    print(f"{data}")
+    valid = True
+    
+    if data['username'] is None or data['username'] == "" and data['password'] is None or data['password'] == "":
+        valid = False
+        flash("Username & Password cannot be blank")
+        return redirect(url_for("get_admin"))
+
+    if data['username'] is None or data['username'] == "":
+        valid = False
+        flash("Username cannot be blank")
+        return redirect(url_for("get_admin"))
+
+    if data['password'] is None or data['password'] == "":
+        valid = False
+        flash("Password cannot be blank")
+        return redirect(url_for("get_admin"))
+
+    if data['password'] != "":
+        if len(data['password']) < 8:
+            valid = False
+            flash("password must be at least 8 characters")
+            return redirect(url_for("get_admin"))
+
+    return redirect(url_for('get_admin_dashboard'))
+
+@app.route("/")
 @app.route("/mainpage/", methods=["GET"])
 def get_main_page():
-    curr_uid = session.get("uid")
-    if curr_uid == "":
+    try:
+        curr_uid = session.get("uid")
+        if curr_uid == "":
+            flash("Please sign in")
+            return redirect(url_for("get_signin"))
+    except:
         flash("Please sign in")
         return redirect(url_for("get_signin"))
 
@@ -250,7 +324,6 @@ def get_main_page():
     profileData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     profileData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
 
-
     #Getting all the possible games
     gameOptions = dict()
     gamesCursor = get_db().cursor()
@@ -258,36 +331,14 @@ def get_main_page():
     for game in gamesinDB:
         gameOptions[game[0]] = game
     
-
-    ############## NOT WORKING ######################################
     # Getting leaderboard info for each game
     UserLists = dict()
     gmsCursor = get_db().cursor()
     allgms = gmsCursor.execute('SELECT id, name FROM Games;').fetchall()
     for gm in allgms:
-        print(gm)
         UserLists[gm[0]] = c.execute('''SELECT username, performanceRating FROM Stats JOIN Users ON Users.id=Stats.user WHERE game=? 
                    ORDER BY performanceRating DESC;''', (gm[0],)).fetchall()
-    
-    print(UserLists)
-    for key, user in UserLists.items():
-        print("this is the key: ")
-        print(key)
-        print("This is the user: ")
-        print(user)
-        print("trying to access inside of user...")
-        print(user[0][0])
 
-    # print(UserLists)
-
-    ############### NOT WORKING ######################################
-    #Trying to get just the leaderboard info for one game (Snake)
-    # snakeLeaders = []
-    # snakeLeaders = c.execute('''SELECT user, performanceRating FROM Stats WHERE game=1 
-    #                ORDER BY performanceRating DESC;''').fetchall()
-    # print(snakeLeaders)
-
-    # print(gameOptions)
     regdb.commit()
     return render_template("mainPage.html", profileData=profileData, UserList=UserLists, gameOptions=gameOptions)
 
@@ -320,8 +371,8 @@ def profile_page():
     for game in gamesName:
 
         #for Get records from each match
-        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND (status=? OR status=?)'.format(game),
-                    (profileData['username'],profileData['username'],"Confirmed","Done",)).fetchall()
+        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND status=?'.format(game),
+                    (profileData['username'],profileData['username'],"Confirmed",)).fetchall()
         recordList = []
         for mId in matchesId:
             match = dict()
@@ -353,7 +404,6 @@ def profile_page():
                 else:
                     match['win'] = None
             recordList.append(match)
-
         gamesRecords[game] = recordList
         
         #Get player state per game
@@ -370,14 +420,19 @@ def profile_page():
 
 @app.route("/profilepage/", methods=["POST"])
 def updaterecord():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
     game = request.form['game']
     matchId = request.form['matchId']
     name = "result" + str(matchId)
     r = request.form.getlist('result')
+    opponentUsername = request.form.get('opponent')
     user = int(request.form['user'])
     regdb = get_db()
     c = get_db().cursor()
-    #c.execute('UPDATE {} SET winnerAccordingToU1 =? WHERE id =?;'.format(game),("Done", 1))
+    currUsername = c.execute('SELECT username FROM Users WHERE id=?',(curr_uid,)).fetchone()[0]
     if len(r) > 0:
         result = r[0]
         if(user == 1):
@@ -400,8 +455,33 @@ def updaterecord():
                     c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Conflicted", matchId))
                 else:
                     c.execute('UPDATE {} SET status=? WHERE id=?;'.format(game),("Done", matchId))
+
+         #Code to increment wins or losses and total Games
+        if result == currUsername:
+            c.execute('UPDATE Stats SET wins = wins+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
+            #Code to update performanceRating
+            opponentUserId = c.execute('SELECT id FROM Users WHERE username=?;',(opponentUsername,)).fetchone()[0]
+            opponentPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(opponentUserId, matchId,)).fetchone()[0]
+            additionToPR = decimal.Decimal(opponentPR) * decimal.Decimal(0.25)
+            currentUserPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(curr_uid, matchId,)).fetchone()[0]
+            newPR = additionToPR + currentUserPR
+            newPR = str(newPR)
+            c.execute('UPDATE Stats SET performanceRating=? WHERE user=? AND game=?;',(newPR, curr_uid, matchId,))
+        else:
+            c.execute('UPDATE Stats SET losses = losses+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
+            #Code to update performanceRating
+            opponentUserId = c.execute('SELECT id FROM Users WHERE username=?;',(opponentUsername,)).fetchone()[0]
+            opponentPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(opponentUserId, matchId,)).fetchone()[0]
+            additionToPR = decimal.Decimal(opponentPR) * decimal.Decimal(0.25)
+            currentUserPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(curr_uid, matchId,)).fetchone()[0]
+            newPR = additionToPR + currentUserPR
+            newPR = str(newPR)
+            c.execute('UPDATE Stats SET performanceRating=? WHERE user=? AND game=?;',(newPR, curr_uid, matchId,))
+        c.execute('UPDATE Stats SET totGamesPlayed = totGamesPlayed+1 WHERE user=? AND game=?;',(curr_uid, matchId,))
+
     regdb.commit()
     return redirect(url_for("profile_page"))
+
 
 
 @app.route("/editprofile/", methods=["GET"])
@@ -471,22 +551,30 @@ def get_matchup_window(gametype):
 
     currUserData['username'] = c.execute('SELECT username FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     currUserData['name'] = c.execute('SELECT name FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
-    # NEED TO ADD CODE HERE GETTING THE USER'S PERFORMANCE RATING IN THIS GAME SO THAT THEY CAN BE MATCHED UP!!
     currUserData['email'] = c.execute('SELECT email FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
     currUserData['icon'] = c.execute('SELECT icon FROM Users WHERE id=?;', (curr_uid,)).fetchone()[0]
 
-    # DON'T WORK RIGHT NOW BECAUSE DON'T HAVE PERFORMANCE RATING SCHEMA SET YET
-    # lowerLimit = currUserData['performanceRating'] - 200
-    # upperLimit = currUserData['performanceRating'] + 200
+    # Code to get the current user's performance rating
+    currUserData['performanceRating'] = c.execute('''SELECT performanceRating 
+                                                    FROM Stats
+                                                    WHERE user=? and game=?;''',
+                                                    (curr_uid, gametype,)).fetchone()
+    if currUserData['performanceRating'] is not None:
+        currUserData['performanceRating'] = currUserData['performanceRating'][0]
+    else:
+        currUserData['performanceRating'] = 1200
 
-    # opponentData = c.execute('''SELECT username, email, performanceRating FROM Users 
-    #    WHERE performanceRating >= ? AND performanceRating <= ? AND NOT id=? ORDER BY RANDOM() LIMIT 1;''', 
-    #     (lowerLimit, upperLimit, curr_uid,)).fetchone()
+    lowerLimit = currUserData['performanceRating'] - 1200
+    upperLimit = currUserData['performanceRating'] + 1200
 
-    opponentData = ("Billy", "b@email.com", 300)
-    
+    opponentData = c.execute('''SELECT username, email, performanceRating 
+                                FROM Stats JOIN Users ON Stats.user=Users.id
+                                WHERE performanceRating>=? AND performanceRating<=?
+                                AND NOT Stats.user=? 
+                                ORDER BY RANDOM() LIMIT 1;''',
+                                (lowerLimit, upperLimit, curr_uid,)).fetchone()
 
-    return render_template("matchup.html", currUserData=currUserData, opponentData=opponentData)
+    return render_template("matchup.html", currUserData=currUserData, opponentData=opponentData, gametype=gametype)
 
 @app.route("/matchaccepted/", methods=["POST"])
 def post_matchup_window_accept():
@@ -499,9 +587,22 @@ def post_matchup_window_accept():
     currentUsername = request.form.get('current-username')
     opponentUsername = request.form.get('opponent-username')
 
-    # NEED TO BE UPDATED TO GET SENT TO THE CORRECT GAME TABLE
-    c.execute('INSERT INTO Matches (username1, username2) VALUES (?,?);', 
-            (currentUsername, opponentUsername,))
+    # Code to insert match data into appropriate table
+    gametype = request.form.get('gametype')
+
+    gameTableName = c.execute('SELECT name FROM Games where id=?', (gametype,)).fetchone()[0]
+
+    c.execute('INSERT INTO {} (username1, username2, status) VALUES (?,?,?);'.format(gameTableName),
+                    (currentUsername, opponentUsername, "Requested",))
+    OppEmail = c.execute('SELECT email FROM users WHERE username=?',(opponentUsername,)).fetchone()[0]
+    # Send email to notify of request
+    msg = Message(
+        sender=app.config.get("MAIL_USERNAME"),
+        recipients=[OppEmail],
+        subject = str(currentUsername) + ' Requested a Match of ' + str(gameTableName),
+        body= str(currentUsername) + ' Requested a Match of ' + str(gameTableName) + '.<br> Please go online to accept or refuse!'
+    )
+    mail.send(msg)
     regdb.commit()
     return redirect(url_for("match_accepted"))
 
@@ -517,14 +618,68 @@ def match_accepted():
 def match_declined():
     return render_template("declinePage.html")
 
-
-
-@app.route("/admin_dashboard/", methods = ["GET"])
-def get_admin_dashboard():
+@app.route("/inbox/", methods=["GET"])
+def get_inbox():
     curr_uid = session.get("uid")
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
+
+    currUsername = c.execute('SELECT username FROM Users WHERE id=?',(curr_uid,)).fetchone()[0]
+
+    requestedGames = dict()
+    requesterOfGames = dict()
+
+    allTypesOfGames = c.execute('SELECT id, name FROM Games;').fetchall()
+
+    for game in allTypesOfGames:
+        gamesWithUserAsRequester = c.execute('SELECT id, username2, dateCreated, status FROM {} WHERE username1=?;'.format(game[1]),
+                    (currUsername,)).fetchall()
+        i = 0
+        for gm in gamesWithUserAsRequester:
+            requesterOfGames[i] = (game[1], gm)
+            i = i+1
+        gamesWithUserAsResponder = c.execute('SELECT id, username1, dateCreated FROM {} WHERE username2=? AND status=\"Requested\";'.format(game[1]),
+                    (currUsername,)).fetchall()
+        for gm in gamesWithUserAsResponder:
+            requestedGames[i] = (game[1], gm)
+            i = i+1   
+
+    return render_template("inbox.html", requestedGames=requestedGames, requesterOfGames=requesterOfGames)
+
+
+@app.route("/inbox/", methods=["POST"])
+def post_inbox():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
+
+    if request.form.get('submit-btn') == "accept":
+        gameId = request.form.get('gameid')
+        gameTable = request.form.get('gametable')
+        c.execute('UPDATE {} SET status=\"Confirmed\" WHERE id=?'.format(gameTable),(gameId,))
+    
+    if request.form.get('submit-btn') == "decline":
+        gameId = request.form.get('gameid')
+        gameTable = request.form.get('gametable')
+        c.execute('UPDATE {} SET status=\"Declined\" WHERE id=?'.format(gameTable),(gameId,))
+    
+    regdb.commit()
+
+    return redirect(url_for("get_inbox"))
+
+
+@app.route("/admin_dashboard/", methods = ["GET"])
+def get_admin_dashboard():
+    # curr_uid = session.get("uid")
+    # if curr_uid == "":
+    #     flash("Please sign in")
+    #     return redirect(url_for("get_signin"))
     regdb = get_db()
     c = get_db().cursor()
 
@@ -589,8 +744,86 @@ def post__admin_dashboard():
     regdb.commit()
     return redirect(url_for("get_admin_dashboard"))
 
+@app.route("/win_loss/", methods = ["GET"])
+def get_win_loss():
+    changedb = get_db()
+    c = get_db().cursor()
+
+    x = 1
+    data = dict()
+
+    c.execute('''
+            SELECT id FROM Users;
+                ''')
+    for r in c:
+        data[f"{x}"] = r
+        x = x + 1
+        
+    print(f"{data}")
+    
+    changedb.commit()
+    return render_template("win_loss.html", data = data)
+
+@app.route("/win_loss/", methods = ["POST"])
+def change_win_loss():
+    changedb = get_db()
+    c = get_db().cursor()
+
+    data = dict()
+    copy = dict()
+
+    fields = ['id', 'win', 'loss']
+
+    for field in fields:
+        data[field] = request.form.get(field)
+        print(f"{data}")
+
+    print(f"{data}")
+
+    c.execute(''' Update Stats
+                SET wins = ?, losses = ?
+                WHERE id = ?;
+             ''',(data['win'], data['loss'], data['id'],))
+
+    data.clear()
+    changedb.commit()
+    return redirect(url_for("change_win_loss"))
+
+
 @app.route("/admin_create_game/", methods = ["POST"])
 def post_create_game_cat():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
+    regdb = get_db()
+    c = get_db().cursor()
+
+    gameToAdd = request.form.get('gamename')
+
+    alreadyExists = c.execute('SELECT id, name FROM Games WHERE name=?',(gameToAdd,)).fetchone()
+    if alreadyExists:
+        flash(f"Game category entered already exists")
+        return redirect(url_for("get_admin_dashboard"))
     
-    return render_template("blank_main.html")
+    c.execute('''
+            CREATE TABLE IF NOT EXISTS {} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username1 TEXT,
+                username2 TEXT,
+                winnerAccordingToU1 TEXT,
+                winnerAccordingToU2 TEXT,
+                status TEXT,
+                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+                FOREIGN KEY (username1) REFERENCES Users(id),
+                FOREIGN KEY (username2) REFERENCES Users(id)
+            );
+            '''.format(gameToAdd))
     
+    c.execute('''
+            INSERT INTO Games (name) VALUES (?);
+            ''',(gameToAdd,))
+    
+    regdb.commit()
+    flash(f"Game has been added")
+    return redirect(url_for("get_admin_dashboard"))    
