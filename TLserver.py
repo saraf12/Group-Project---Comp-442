@@ -808,25 +808,17 @@ def post_create_game_cat():
     flash(f"Game has been added")
     return redirect(url_for("get_admin_dashboard"))    
 
-@app.route("/testingspace/", methods=["GET"])
-def test_for_ajax():
+
+@app.route("/datecreated/<string:gametype>/<int:gameid>", methods=["GET"])
+def get_datecreated(gametype, gameid):
     regdb = get_db()
     c = get_db().cursor()
-    dtObject = c.execute('SELECT dateCreated FROM TicTacToe WHERE id=1;').fetchone()
-    print(dtObject)
-    print("Yup it's running")
-    return (f"Hello")
+    # print(gametype)
+    dtObject = c.execute('SELECT dateCreated FROM {} WHERE id=?;'.format(gametype),(gameid,)).fetchone()
+    if dtObject is not None and dtObject != "":
+        dtObject = dtObject[0]  
+    # print(dtObject)
 
-@app.route("/expiration/", methods=["GET"])
-def get_expiration():
-    gameId = request.form.get('gameid')
-    return render_template("expirationCountdown.html", gameId=gameId)
-
-@app.route("/datecreated/<int:gameid>", methods=["GET"])
-def get_datecreated(gameid):
-    regdb = get_db()
-    c = get_db().cursor()
-    dtObject = c.execute('SELECT dateCreated FROM TicTacToe WHERE id=1;').fetchone()
     # what is returned if get datetime from sql table: '2020-12-01 23:01:59'
-    dateCreated = '2020-12-01 23:01:59'
-    return jsonify(dateCreated)
+    # dateCreated = '2020-12-01 23:01:59'
+    return jsonify(dtObject)

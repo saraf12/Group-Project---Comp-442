@@ -8,12 +8,15 @@
 var createClock;
 //ar cnt = 0;
 var callingBtnValue;
+var gametype;
 
 function seeCountdown() {
   callingBtnValue = event.target.value;
   let container = document.getElementById(callingBtnValue);
   //console.log(container);
   let displays = document.getElementsByClassName("expTime")
+  gametype = container.nextElementSibling.value;
+  //console.log(container.nextElementSibling.value);
   
   // if(container == displays[0]) {
   //   console.log("They're equal");
@@ -22,12 +25,12 @@ function seeCountdown() {
   // }
 
   clearInterval(createClock);
-  console.log(container.style.display);
+ // console.log(container.style.display);
   if(container.style.display == "none") {
     container.style.display = "block";
     createClock = setInterval(newerWay, 1000);
     for(let i = 0; i < displays.length; i++) {
-      console.log(displays[i]);
+      //console.log(displays[i]);
       if(displays[i] != container){
         displays[i].style.display = "none";
       }
@@ -74,7 +77,7 @@ function displayTime() {
 function refreshCountdown(data) {
   //let gameid = document.getElementById("expiration-btn").value;
   let container = document.getElementById(callingBtnValue);
-  console.log(container.id);
+  //console.log(container.id);
   let oneweek = 604800000;
   let weekFromSetup = Date.parse(data) + oneweek;
   //console.log(weekFromSetup);
@@ -104,6 +107,8 @@ function timebetween(date1, date2) {
   difference_ms = difference_ms/60; 
   var hours = Math.floor(difference_ms % 24);  
   var days = Math.floor(difference_ms/24);
+
+  //return days + ' days, ' + hours + ' hours, ' + minutes + ' minutes';
   
   return days + ' days, ' + hours + ' hours, ' + minutes + ' minutes, and ' + seconds + ' seconds';
 }
@@ -114,7 +119,7 @@ function newerWay() {
   let gameid = document.getElementById(callingBtnValue).id;
   //let gameid = document.getElementById("expiration-btn").value;
   //console.log(gameid)
-fetch(`/datecreated/${gameid}`)
+fetch(`/datecreated/${gametype}/${gameid}`)
   .then(function (response) {
     if (response.ok) { return response.json(); }
     else { return Promise.reject(response); }
