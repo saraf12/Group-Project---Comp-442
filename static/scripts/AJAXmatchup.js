@@ -9,13 +9,17 @@ var createClock;
 //ar cnt = 0;
 var callingBtnValue;
 var gametype;
+var matchid;
 
 function seeCountdown() {
   callingBtnValue = event.target.value;
   let container = document.getElementById(callingBtnValue);
   //console.log(container);
   let displays = document.getElementsByClassName("expTime")
-  gametype = container.nextElementSibling.value;
+  let gametypeinput = container.nextElementSibling;
+  gametype = gametypeinput.value;
+  let matchidinput = gametypeinput.nextElementSibling;
+  matchid = matchidinput.value;
   //console.log(container.nextElementSibling.value);
   
   // if(container == displays[0]) {
@@ -66,12 +70,12 @@ function hideCountdown() {
 }
 
 
-function displayTime() {
-  let date = new Date();
-  //let dueDate = new Date(Date.UTC(2020, 11, 20, 12));
-  //let time = date.toLocaleTimeString();
-  document.querySelector('.clock').textContent = date;
-}
+// function displayTime() {
+//   let date = new Date();
+//   //let dueDate = new Date(Date.UTC(2020, 11, 20, 12));
+//   //let time = date.toLocaleTimeString();
+//   document.querySelector('.clock').textContent = date;
+// }
 
 
 function refreshCountdown(data) {
@@ -116,10 +120,10 @@ function timebetween(date1, date2) {
 
 
 function newerWay() {
-  let gameid = document.getElementById(callingBtnValue).id;
+  //let gameid = document.getElementById(callingBtnValue).id;
   //let gameid = document.getElementById("expiration-btn").value;
   //console.log(gameid)
-fetch(`/datecreated/${gametype}/${gameid}`)
+fetch(`/datecreated/${gametype}/${matchid}`)
   .then(function (response) {
     if (response.ok) { return response.json(); }
     else { return Promise.reject(response); }
