@@ -10,6 +10,7 @@ var createClock;
 var callingBtnValue;
 var gametype;
 var matchid;
+var matchexpired = 0;
 
 function seeCountdown() {
   callingBtnValue = event.target.value;
@@ -82,17 +83,38 @@ function refreshCountdown(data) {
   //let gameid = document.getElementById("expiration-btn").value;
   let container = document.getElementById(callingBtnValue);
   //console.log(container.id);
+  /* Uncomment this code after done testing!!!!!
   let oneweek = 604800000;
   let weekFromSetup = Date.parse(data) + oneweek;
-  //console.log(weekFromSetup);
+  */
+  
+  /* Comment this code out after done testing!! */
+  let oneweek = -999999999999;
+  //console.log(Date.parse(data));
+  //DID NOT WORK!!
+  // let now = new Date();
+  // let utc_timestamp = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() , 
+  //     now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
+  // console.log(utc_timestamp);
+  let weekFromSetup = Date.parse(data) + oneweek;
+  console.log(weekFromSetup);
 
   let timeTillExpiration = timebetween(Date.parse(new Date()), weekFromSetup);
   //console.log(timeTillExpiration);
 
-  let trialrun = timebetween(Date.parse(new Date()), Date.parse(data));
+  //let trialrun = timebetween(Date.parse(new Date()), Date.parse(data));
   //console.log(trialrun);
 
-  container.innerHTML = `Reporting window ends in: ${timeTillExpiration}`
+  if(timeTillExpiration.includes("-")) {
+    container.innerHTML = "Time to report match has expired"
+    container.parentElement.previousElementSibling.previousElementSibling.firstElementChild.disabled = true;
+    console.log(container.parentElement.previousElementSibling.previousElementSibling.firstElementChild)
+    //return -1
+    matchexpired = 1;
+  } else{
+    container.innerHTML = `Reporting window ends in: ${timeTillExpiration}`
+  }
+
 }
 
 /* Code modified from htmlgoodies.com article by Robert Gravelle*/
@@ -123,12 +145,23 @@ function newerWay() {
   //let gameid = document.getElementById(callingBtnValue).id;
   //let gameid = document.getElementById("expiration-btn").value;
   //console.log(gameid)
-fetch(`/datecreated/${gametype}/${matchid}`)
+fetch(`/datecreated/${gametype}/${matchid}/${matchexpired}`)
   .then(function (response) {
     if (response.ok) { return response.json(); }
     else { return Promise.reject(response); }
   })
+  .then(function(message){
+    if(message == "Expired") {
+      throw 'Game has expired'
+    }
+    else {
+      return message;
+    }
+  })
   .then(refreshCountdown)
+  // .then(function(value) {
+    
+  // })
   .catch(function(error) {
           console.log(error);
           //Doesn't work

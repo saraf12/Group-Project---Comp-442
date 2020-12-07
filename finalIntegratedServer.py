@@ -2,8 +2,7 @@ import sqlite3
 import os
 import base64
 import time
-import decimal
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from traceback import print_exc
 from cryptography.fernet import Fernet
 from passlib.hash import bcrypt_sha256
@@ -33,7 +32,7 @@ conn = sqlite3.connect(dbpath)
 c = conn.cursor()
 
 # c.execute('''
-#             DROP TABLE IF EXISTS Checkers;
+#             DROP TABLE IF EXISTS Games;
 #             ''')
 
 
@@ -49,33 +48,33 @@ c.execute('''
             );
             ''')
 
-c.execute('''
-            CREATE TABLE IF NOT EXISTS TicTacToe (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username1 TEXT,
-                username2 TEXT,
-                winnerAccordingToU1 TEXT,
-                winnerAccordingToU2 TEXT,
-                status TEXT,
-                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
-                FOREIGN KEY (username1) REFERENCES Users(id),
-                FOREIGN KEY (username2) REFERENCES Users(id)
-            );
-            ''')
+# c.execute('''
+#             CREATE TABLE IF NOT EXISTS TicTacToe (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 username1 TEXT,
+#                 username2 TEXT,
+#                 winnerAccordingToU1 TEXT,
+#                 winnerAccordingToU2 TEXT,
+#                 status TEXT,
+#                 dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+#                 FOREIGN KEY (username1) REFERENCES Users(id),
+#                 FOREIGN KEY (username2) REFERENCES Users(id)
+#             );
+#             ''')
 
-c.execute('''
-            CREATE TABLE IF NOT EXISTS MarioKart (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username1 TEXT,
-                username2 TEXT,
-                winnerAccordingToU1 TEXT,
-                winnerAccordingToU2 TEXT,
-                status TEXT,
-                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
-                FOREIGN KEY (username1) REFERENCES Users(id),
-                FOREIGN KEY (username2) REFERENCES Users(id)
-            );
-            ''')
+# c.execute('''
+#             CREATE TABLE IF NOT EXISTS MarioKart (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 username1 TEXT,
+#                 username2 TEXT,
+#                 winnerAccordingToU1 TEXT,
+#                 winnerAccordingToU2 TEXT,
+#                 status TEXT,
+#                 dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+#                 FOREIGN KEY (username1) REFERENCES Users(id),
+#                 FOREIGN KEY (username2) REFERENCES Users(id)
+#             );
+#             ''')
 
 c.execute('''
             CREATE TABLE IF NOT EXISTS Games (
@@ -105,7 +104,7 @@ conn.commit()
 #             ''')
 
 # c.execute('''
-#             DELETE FROM Games where id = 4;
+#             DELETE FROM Users where id = 5;
 #             ''')
 
 # c.execute('''
@@ -275,41 +274,6 @@ def post_admin():
         print_exc()
         return redirect(url_for("get_admin"))
 
-
-
-    # fields = ['username', 'password']
-
-    # data = dict()
-
-    # for field in fields:
-    #     data[field] = request.form.get(field)
-    
-    # print(f"{data}")
-    # valid = True
-    
-    # if data['username'] is None or data['username'] == "" and data['password'] is None or data['password'] == "":
-    #     valid = False
-    #     flash("Username & Password cannot be blank")
-    #     return redirect(url_for("get_admin"))
-
-    # if data['username'] is None or data['username'] == "":
-    #     valid = False
-    #     flash("Username cannot be blank")
-    #     return redirect(url_for("get_admin"))
-
-    # if data['password'] is None or data['password'] == "":
-    #     valid = False
-    #     flash("Password cannot be blank")
-    #     return redirect(url_for("get_admin"))
-
-    # if data['password'] != "":
-    #     if len(data['password']) < 8:
-    #         valid = False
-    #         flash("password must be at least 8 characters")
-    #         return redirect(url_for("get_admin"))
-
-    # return redirect(url_for('get_admin_dashboard'))
-
 @app.route("/")
 @app.route("/mainpage/", methods=["GET"])
 def get_main_page():
@@ -387,8 +351,8 @@ def profile_page():
     for game in gamesName:
 
         #for Get records from each match
-        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND (status=? OR status=? OR status=?)'.format(game),
-                    (profileData['username'],profileData['username'],"Confirmed", "Done","Expired",)).fetchall()
+        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND status=?'.format(game),
+                    (profileData['username'],profileData['username'],"Confirmed",)).fetchall()
         recordList = []
         for mId in matchesId:
             match = dict()
@@ -419,7 +383,6 @@ def profile_page():
                     match['win'] = 1
                 else:
                     match['win'] = None
-            match['status'] = c.execute('SELECT status FROM {} WHERE id = ?'.format(game),(mId,)).fetchone()
             recordList.append(match)
         gamesRecords[game] = recordList
         
@@ -427,14 +390,8 @@ def profile_page():
         stats = dict()
         gameID = c.execute('SELECT id FROM Games WHERE name=?',(game,)).fetchone()
         stats["performance"] = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
-        if stats["performance"] is None:
-            stats["performance"] = 1200
         stats["wins"] = c.execute('SELECT wins FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
-        if stats["wins"] is None:
-            stats["wins"] = 0
         stats["losses"] = c.execute('SELECT losses FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
-        if stats["losses"] is None:
-            stats["losses"] = 0
         gameStats[game] = stats
 
     return render_template("profile.html", profileData=profileData,gameStats=gameStats, gamesRecords = gamesRecords, gameslst = gamesName)
@@ -505,7 +462,6 @@ def updaterecord():
 
     regdb.commit()
     return redirect(url_for("profile_page"))
-
 
 
 @app.route("/editprofile/", methods=["GET"])
@@ -692,12 +648,20 @@ def post_inbox():
 
 @app.route("/admin_dashboard/", methods = ["GET"])
 def get_admin_dashboard():
-    # curr_uid = session.get("uid")
-    # if curr_uid == "":
-    #     flash("Please sign in")
-    #     return redirect(url_for("get_signin"))
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_admin"))
     regdb = get_db()
     c = get_db().cursor()
+
+    try:
+        exp = datetime.strptime(session.get("admin-expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_admin"))
 
     Users = dict()
 
@@ -786,9 +750,8 @@ def change_win_loss():
     c = get_db().cursor()
 
     data = dict()
-    copy = dict()
 
-    fields = ['id', 'win', 'loss'];
+    fields = ['id', 'win', 'loss']
 
     for field in fields:
         data[field] = request.form.get(field)
@@ -808,6 +771,10 @@ def change_win_loss():
 
 @app.route("/admin_create_game/", methods = ["POST"])
 def post_create_game_cat():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
     regdb = get_db()
     c = get_db().cursor()
 
@@ -841,31 +808,13 @@ def post_create_game_cat():
     return redirect(url_for("get_admin_dashboard"))    
 
 
-# @app.route("/datecreated/<string:gametype>/<int:gameid>", methods=["GET"])
-@app.route("/datecreated/<string:gametype>/<int:gameid>/<int:expiration>", methods=["GET"])
-def get_datecreated(gametype, gameid, expiration):
+@app.route("/datecreated/<string:gametype>/<int:gameid>", methods=["GET"])
+def get_datecreated(gametype, gameid):
     regdb = get_db()
     c = get_db().cursor()
-    # print(gametype)
-    if expiration == 1:
-        c.execute('UPDATE {} SET status=? WHERE id=?;'.format(gametype),("Expired", gameid))
-        regdb.commit()
-        dtObject = None
-        return jsonify("Expired")
-    else:
-        dtObject = c.execute('SELECT dateCreated FROM {} WHERE id=?;'.format(gametype),(gameid,)).fetchone()
-        if dtObject is not None and dtObject != "":
-            dtObject = dtObject[0]  
-        # print(dtObject)
-        # strftime("%d/%m/%Y %H:%M:%S")
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        dateStr = "2020-12-06 03:33:00"
-        print(dtObject)
-        # if now > dtObject:
-        #     print("now is greater than saved date")
-        # else:
-        #     print("now is not greater than saved date")
-        # what is returned if get datetime from sql table: '2020-12-01 23:01:59'
-        # dateCreated = '2020-12-01 23:01:59'
-        return jsonify(dtObject)
+    dtObject = c.execute('SELECT dateCreated FROM {} WHERE id=?;'.format(gametype),(gameid,)).fetchone()
+    if dtObject is not None and dtObject != "":
+        dtObject = dtObject[0]  
+
+    return jsonify(dtObject)
+    

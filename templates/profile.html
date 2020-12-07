@@ -67,7 +67,7 @@
                         </td>
 
                     <form action = "/profilepage/" method = "POST">
-                        {% if match.response == 0 %}
+                        {% if match.response == 0 and match.status != "Expired" %}
                         <td>
                             <input type="hidden" name="game" value="{{g}}">
                             <input type="hidden" name="matchId" value="{{match.id}}">
@@ -117,6 +117,22 @@
                         </td>
                         <!-- <td><button type="submit" formmethod="post" style="background-color: blanchedalmond;" name="submitRecord" disabled >Submit</button></td> -->
                         {% endif %}
+
+                        {% if match.status == "Expired" %}
+                        <td>
+                            <input type="hidden" name="matchId" value="{{match.id}}">
+                            <input type="hidden" name="user" value="{{match.user}}">
+                            <input type="radio" name="result" value="{{match.c_username}}" disabled>
+                            <label>Win</label><br>
+                            <input type="radio" name="result" value="{{match.username}}" disabled>
+                            <label>Loss</label>
+                        </td>
+                        <td>
+                            <p style="padding: 0.5rem">Match expired before any result was reported</p>
+                        </td>
+                        {% endif %}
+                        <!-- <td><button type="submit" formmethod="post" style="background-color: blanchedalmond;" name="submitRecord" disabled >Submit</button></td> -->
+    
 
                     </form>
 
