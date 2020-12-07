@@ -27,7 +27,7 @@
         Performance Rating: {{ opponentData[2] }} <br>
         </div>
 
-        <form action = "http://localhost:5000/matchaccepted/" method = "POST">
+        <form action = "/matchaccepted/" method = "POST">
         <input type="hidden" name="opponent-username" id="opponent-username" value="{{ opponentData[0] }}">
         <input type="hidden" name="current-username" id="current-username" value="{{ currUserData.username }}">
         <input type="hidden" name="gametype" id="gametype" value="{{ gametype }}">
@@ -35,7 +35,7 @@
 
             <button class="matchupbtn" id ="AcceptedRequest" type="submit">Accept</button> <br>
         </form>
-        <form action="http://localhost:5000/matchdeclined/" method ="POST">
+        <form action="/matchdeclined/" method ="POST">
             <button class="matchupbtn" id ="DeclinedRequest" type="submit" >Decline</button>
         </form>
     </body>

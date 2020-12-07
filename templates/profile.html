@@ -44,16 +44,16 @@
                 
                 
                 {% if not gamesRecords[g]%}
-                    <button id="recordBtn" disabled>Update Record</button>
+                    <button id="{{g}}" disabled>Update Record</button>
                     <p>No Record!!!</p>
                     <p>No Games registered</p>
                 
                 {% else %}
-                    <button id="recordBtn">Update Record</button>
+                    <button id="{{g}}"class="recordBtn">Update Record</button>
                 {% endif %}
 
                 <div class="table">
-                <table id="recordTable">
+                <table id="recordTable{{g}}" class="recordTable">
                    
                 {% for match in gamesRecords[g] %}
                     <tr>
@@ -86,8 +86,12 @@
                             <label>Never Played</label> -->
                         </td>
                         <td><button type="submit" formmethod="post" name="submitRecord" >Submit</button></td>
-                        <td><button onclick="seeCountdown()" id="expiration-btn" type="button" value="{{match.id}}">Time until match expires</button></td>
-                        <td><p class="expTime" id="{{ match.id }}" style="display: none"></p></td>
+                        <td><button onclick="seeCountdown()" id="expiration-btn" type="button" value="{{g}}{{match.id}}">Time until match expires</button></td>
+                        <td>
+                            <p class="expTime" id="{{g}}{{ match.id }}" style="display: none"></p>
+                            <input type="hidden" class="gametype" value="{{ g }}">
+                            <input type="hidden" class="matchid" value="{{ match.id }}">
+                        </td>
                         {% endif %}
                         {% if match.response == 1 %}
                         <td>

@@ -35,7 +35,7 @@ button{
 .record{
     padding-left: 30%;
 }
-#recordTable{
+.recordTable{
     display: none; 
     background-color:darkgray;
     width: 75%; 
