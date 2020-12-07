@@ -808,13 +808,24 @@ def post_create_game_cat():
     return redirect(url_for("get_admin_dashboard"))    
 
 
-@app.route("/datecreated/<string:gametype>/<int:gameid>", methods=["GET"])
-def get_datecreated(gametype, gameid):
+@app.route("/datecreated/<string:gametype>/<int:gameid>/<int:expiration>", methods=["GET"])
+def get_datecreated(gametype, gameid, expiration):
     regdb = get_db()
     c = get_db().cursor()
-    dtObject = c.execute('SELECT dateCreated FROM {} WHERE id=?;'.format(gametype),(gameid,)).fetchone()
-    if dtObject is not None and dtObject != "":
-        dtObject = dtObject[0]  
+ 
+    if expiration == 1:
+        c.execute('UPDATE {} SET status=? WHERE id=?;'.format(gametype),("Expired", gameid))
+        regdb.commit()
+        dtObject = None
+        return jsonify("Expired")
+    else:
+        dtObject = c.execute('SELECT dateCreated FROM {} WHERE id=?;'.format(gametype),(gameid,)).fetchone()
+        if dtObject is not None and dtObject != "":
+            dtObject = dtObject[0]  
 
-    return jsonify(dtObject)
-    
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        dateStr = "2020-12-06 03:33:00"
+        print(dtObject)
+        
+        return jsonify(dtObject)
