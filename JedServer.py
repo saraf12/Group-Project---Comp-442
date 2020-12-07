@@ -215,7 +215,37 @@ def post_admin():
     
 @app.route("/admin_dashboard/", methods = ["GET"])
 def get_admin_dashboard():
-    return render_template("admin_dashboard.html")
+        admindb = get_db()
+        c = get_db().cursor()
+
+        c.execute('''
+            SELECT username, icon FROM USERS;
+        ''')
+        user = dict()
+        game = dict()
+        match = dict()
+        x = 1
+
+        for r in c: 
+            user[f"{x}"] = r
+            x = x + 1
+
+        c.execute('''
+            SELECT name FROM Games;
+        ''')
+        for r in c: 
+            game[f"{x}"] = r
+            x = x + 1
+
+        #.execute('''
+        #    SELECT username, icon FROM Matches;
+        #''')
+        #for r in c: 
+        #    match[f"{x}"] = r
+        #    x = x + 1
+
+        admindb.commit()
+        return render_template("admin_dashboard.html")
 
 @app.route("/create_game/", methods = ["GET"])
 def get_create_game():
