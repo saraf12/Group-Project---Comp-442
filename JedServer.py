@@ -318,21 +318,15 @@ def change_win_loss():
     data = dict()
     copy = dict()
 
-    fields = ['id', 'win', 'loss'];
+    fields = ['id', 'name','win', 'loss'];
 
     for field in fields:
         data[field] = request.form.get(field)
-        print(f"{data[field]}")
-
-    print(f"{data}")
-    print(f"{data['id']}")
-    print(f"{data['win']}")
-    print(f"{data['loss']}")
 
     c.execute(''' Update Users
                 SET wins = ?, losses = ?
-                WHERE id = ?;
-             ''',(data['win'], data['loss'], data['id'],))
+                WHERE username = ?;
+             ''',(data['win'], data['loss'], data['name'],))
 
     c.execute(''' Update Stats
                 SET wins = ?, losses = ?
@@ -350,7 +344,7 @@ def get_admin_user():
 
     Users = dict()
 
-    userlist = c.execute('SELECT id, name, wins, losses, icon FROM Users;').fetchall()
+    userlist = c.execute('SELECT id, username, wins, losses, icon FROM Users;').fetchall()
     
     i = 0
     for record in userlist:
