@@ -75,9 +75,9 @@ function timebetween(date1, date2) {
   var hours = Math.floor(difference_ms % 24);  
   var days = Math.floor(difference_ms/24);
 
-  //return days + ' days, ' + hours + ' hours, ' + minutes + ' minutes';
+  return days + ' days, ' + hours + ' hours, ' + minutes + ' minutes';
   
-  return days + ' days, ' + hours + ' hours, ' + minutes + ' minutes, and ' + seconds + ' seconds';
+  //return days + ' days, ' + hours + ' hours, ' + minutes + ' minutes, and ' + seconds + ' seconds';
 }
 
 
