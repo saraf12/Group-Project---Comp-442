@@ -3,14 +3,28 @@ import os
 import base64
 import time
 import decimal
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from traceback import print_exc
 from cryptography.fernet import Fernet
 from passlib.hash import bcrypt_sha256
 from flask import Flask, render_template, request, redirect, url_for, abort, session, flash, g, jsonify, make_response
+from flask_mail import Mail, Message
+
 app = Flask(__name__)
+
+mail_settings = {
+    "MAIL_SERVER": 'smtp.gmail.com',
+    "MAIL_PORT": 465,
+    "MAIL_USE_TLS": False,
+    "MAIL_USE_SSL": True,
+    "MAIL_USERNAME": 'noreplythirdpartymatchmaker@gmail.com',
+    "MAIL_PASSWORD": 'Comp442A'
+}
+app.config.update(mail_settings)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config["SECRET_KEY"] = "correcthorsebatterystaple"
+
+mail = Mail(app)
 
 scriptdir = os.path.dirname(__file__)
 
@@ -33,7 +47,7 @@ conn = sqlite3.connect(dbpath)
 c = conn.cursor()
 
 # c.execute('''
-#             DROP TABLE IF EXISTS Checkers;
+#             DROP TABLE IF EXISTS Games;
 #             ''')
 
 
@@ -49,33 +63,33 @@ c.execute('''
             );
             ''')
 
-c.execute('''
-            CREATE TABLE IF NOT EXISTS TicTacToe (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username1 TEXT,
-                username2 TEXT,
-                winnerAccordingToU1 TEXT,
-                winnerAccordingToU2 TEXT,
-                status TEXT,
-                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
-                FOREIGN KEY (username1) REFERENCES Users(id),
-                FOREIGN KEY (username2) REFERENCES Users(id)
-            );
-            ''')
+# c.execute('''
+#             CREATE TABLE IF NOT EXISTS TicTacToe (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 username1 TEXT,
+#                 username2 TEXT,
+#                 winnerAccordingToU1 TEXT,
+#                 winnerAccordingToU2 TEXT,
+#                 status TEXT,
+#                 dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+#                 FOREIGN KEY (username1) REFERENCES Users(id),
+#                 FOREIGN KEY (username2) REFERENCES Users(id)
+#             );
+#             ''')
 
-c.execute('''
-            CREATE TABLE IF NOT EXISTS MarioKart (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username1 TEXT,
-                username2 TEXT,
-                winnerAccordingToU1 TEXT,
-                winnerAccordingToU2 TEXT,
-                status TEXT,
-                dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
-                FOREIGN KEY (username1) REFERENCES Users(id),
-                FOREIGN KEY (username2) REFERENCES Users(id)
-            );
-            ''')
+# c.execute('''
+#             CREATE TABLE IF NOT EXISTS MarioKart (
+#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+#                 username1 TEXT,
+#                 username2 TEXT,
+#                 winnerAccordingToU1 TEXT,
+#                 winnerAccordingToU2 TEXT,
+#                 status TEXT,
+#                 dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
+#                 FOREIGN KEY (username1) REFERENCES Users(id),
+#                 FOREIGN KEY (username2) REFERENCES Users(id)
+#             );
+#             ''')
 
 c.execute('''
             CREATE TABLE IF NOT EXISTS Games (
@@ -105,7 +119,7 @@ conn.commit()
 #             ''')
 
 # c.execute('''
-#             DELETE FROM Games where id = 4;
+#             DELETE FROM Users where id = 5;
 #             ''')
 
 # c.execute('''
@@ -275,41 +289,6 @@ def post_admin():
         print_exc()
         return redirect(url_for("get_admin"))
 
-
-
-    # fields = ['username', 'password']
-
-    # data = dict()
-
-    # for field in fields:
-    #     data[field] = request.form.get(field)
-    
-    # print(f"{data}")
-    # valid = True
-    
-    # if data['username'] is None or data['username'] == "" and data['password'] is None or data['password'] == "":
-    #     valid = False
-    #     flash("Username & Password cannot be blank")
-    #     return redirect(url_for("get_admin"))
-
-    # if data['username'] is None or data['username'] == "":
-    #     valid = False
-    #     flash("Username cannot be blank")
-    #     return redirect(url_for("get_admin"))
-
-    # if data['password'] is None or data['password'] == "":
-    #     valid = False
-    #     flash("Password cannot be blank")
-    #     return redirect(url_for("get_admin"))
-
-    # if data['password'] != "":
-    #     if len(data['password']) < 8:
-    #         valid = False
-    #         flash("password must be at least 8 characters")
-    #         return redirect(url_for("get_admin"))
-
-    # return redirect(url_for('get_admin_dashboard'))
-
 @app.route("/")
 @app.route("/mainpage/", methods=["GET"])
 def get_main_page():
@@ -364,6 +343,14 @@ def profile_page():
     curr_uid = session.get("uid")
     if curr_uid == "":
         flash("Please sign in")
+        return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
         return redirect(url_for("get_signin"))
 
     regdb = get_db()
@@ -441,12 +428,22 @@ def profile_page():
 
 
 
+
 @app.route("/profilepage/", methods=["POST"])
 def updaterecord():
     curr_uid = session.get("uid")
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     game = request.form['game']
     matchId = request.form['matchId']
     name = "result" + str(matchId)
@@ -507,7 +504,6 @@ def updaterecord():
     return redirect(url_for("profile_page"))
 
 
-
 @app.route("/editprofile/", methods=["GET"])
 def get_edit_profile_page():
      # get info to prefill fields
@@ -515,6 +511,15 @@ def get_edit_profile_page():
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
     profileData = dict()
@@ -530,6 +535,15 @@ def post_edit_profile_page():
     curr_uid = session.get("uid")
     regdb = get_db()
     c = get_db().cursor()
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     data = dict()
     fields = ['username', 'name', 'email', 'password', 'confirm-password', 'Iprofile']
     for field in fields:
@@ -569,6 +583,15 @@ def get_matchup_window(gametype):
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
     currUserData = dict()
@@ -606,6 +629,15 @@ def post_matchup_window_accept():
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
     currentUsername = request.form.get('current-username')
@@ -618,6 +650,15 @@ def post_matchup_window_accept():
 
     c.execute('INSERT INTO {} (username1, username2, status) VALUES (?,?,?);'.format(gameTableName),
                     (currentUsername, opponentUsername, "Requested",))
+    # Send email to notify of request
+    OppEmail = c.execute('SELECT email FROM users WHERE username=?',(opponentUsername,)).fetchone()[0]
+    msg = Message(
+        sender=app.config.get("MAIL_USERNAME"),
+        recipients=[OppEmail],
+        subject = str(currentUsername) + ' Requested a Match of ' + str(gameTableName),
+        body= str(currentUsername) + ' Requested a Match of ' + str(gameTableName) + '.<br> Please go online to accept or refuse!'
+    )
+    mail.send(msg)
 
     regdb.commit()
     return redirect(url_for("match_accepted"))
@@ -640,6 +681,15 @@ def get_inbox():
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+    
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
 
@@ -672,6 +722,15 @@ def post_inbox():
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
 
@@ -692,12 +751,20 @@ def post_inbox():
 
 @app.route("/admin_dashboard/", methods = ["GET"])
 def get_admin_dashboard():
-    # curr_uid = session.get("uid")
-    # if curr_uid == "":
-    #     flash("Please sign in")
-    #     return redirect(url_for("get_signin"))
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_admin"))
     regdb = get_db()
     c = get_db().cursor()
+
+    try:
+        exp = datetime.strptime(session.get("admin-expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_admin"))
 
     Users = dict()
 
@@ -786,9 +853,8 @@ def change_win_loss():
     c = get_db().cursor()
 
     data = dict()
-    copy = dict()
 
-    fields = ['id', 'win', 'loss'];
+    fields = ['id', 'win', 'loss']
 
     for field in fields:
         data[field] = request.form.get(field)
@@ -808,6 +874,10 @@ def change_win_loss():
 
 @app.route("/admin_create_game/", methods = ["POST"])
 def post_create_game_cat():
+    curr_uid = session.get("uid")
+    if curr_uid == "":
+        flash("Please sign in")
+        return redirect(url_for("get_signin"))
     regdb = get_db()
     c = get_db().cursor()
 
@@ -841,12 +911,11 @@ def post_create_game_cat():
     return redirect(url_for("get_admin_dashboard"))    
 
 
-# @app.route("/datecreated/<string:gametype>/<int:gameid>", methods=["GET"])
 @app.route("/datecreated/<string:gametype>/<int:gameid>/<int:expiration>", methods=["GET"])
 def get_datecreated(gametype, gameid, expiration):
     regdb = get_db()
     c = get_db().cursor()
-    # print(gametype)
+ 
     if expiration == 1:
         c.execute('UPDATE {} SET status=? WHERE id=?;'.format(gametype),("Expired", gameid))
         regdb.commit()
@@ -856,16 +925,5 @@ def get_datecreated(gametype, gameid, expiration):
         dtObject = c.execute('SELECT dateCreated FROM {} WHERE id=?;'.format(gametype),(gameid,)).fetchone()
         if dtObject is not None and dtObject != "":
             dtObject = dtObject[0]  
-        # print(dtObject)
-        # strftime("%d/%m/%Y %H:%M:%S")
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        dateStr = "2020-12-06 03:33:00"
-        print(dtObject)
-        # if now > dtObject:
-        #     print("now is greater than saved date")
-        # else:
-        #     print("now is not greater than saved date")
-        # what is returned if get datetime from sql table: '2020-12-01 23:01:59'
-        # dateCreated = '2020-12-01 23:01:59'
+        
         return jsonify(dtObject)
