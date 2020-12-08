@@ -63,33 +63,16 @@ c.execute('''
             );
             ''')
 
-# c.execute('''
-#             CREATE TABLE IF NOT EXISTS TicTacToe (
-#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-#                 username1 TEXT,
-#                 username2 TEXT,
-#                 winnerAccordingToU1 TEXT,
-#                 winnerAccordingToU2 TEXT,
-#                 status TEXT,
-#                 dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
-#                 FOREIGN KEY (username1) REFERENCES Users(id),
-#                 FOREIGN KEY (username2) REFERENCES Users(id)
-#             );
-#             ''')
+c.execute('''
+            CREATE TABLE IF NOT EXISTS Admins (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE,
+                name TEXT,
+                email TEXT,
+                passwordhash TEXT
+            );
+            ''')
 
-# c.execute('''
-#             CREATE TABLE IF NOT EXISTS MarioKart (
-#                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-#                 username1 TEXT,
-#                 username2 TEXT,
-#                 winnerAccordingToU1 TEXT,
-#                 winnerAccordingToU2 TEXT,
-#                 status TEXT,
-#                 dateCreated DATETIME NOT NULL DEFAULT(DATETIME('now')),
-#                 FOREIGN KEY (username1) REFERENCES Users(id),
-#                 FOREIGN KEY (username2) REFERENCES Users(id)
-#             );
-#             ''')
 
 c.execute('''
             CREATE TABLE IF NOT EXISTS Games (
@@ -374,8 +357,8 @@ def profile_page():
     for game in gamesName:
 
         #for Get records from each match
-        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND (status=? OR status=? OR status=?)'.format(game),
-                    (profileData['username'],profileData['username'],"Confirmed", "Done","Expired",)).fetchall()
+        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND (status=? OR status=? OR status=? OR status=?)'.format(game),
+                    (profileData['username'],profileData['username'],"Confirmed", "Done","Expired","Conflicted")).fetchall()
         recordList = []
         for mId in matchesId:
             match = dict()
@@ -901,13 +884,11 @@ def post_create_game_cat():
 
     gameToAdd = request.form.get('gamename')
 
-    alreadyExists = c.execute('SELECT id, name FROM Games WHERE name=?',(gameToAdd,)).fetchone()
+    alreadyExists = c.execute('SELECT id, name FROM Games WHERE name=?;',(gameToAdd,)).fetchone()
     if alreadyExists:
         flash(f"Game category entered already exists")
         return redirect(url_for("get_admin_dashboard"))
-    if gameToAdd == "" or gameToAdd is None:
-        flash(f"Add game's name to create the game")
-        return redirect(url_for("get_admin_dashboard"))
+    
     c.execute('''
             CREATE TABLE IF NOT EXISTS {} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -927,8 +908,18 @@ def post_create_game_cat():
             ''',(gameToAdd,))
     
     regdb.commit()
+
+    gameId = c.execute('SELECT id FROM Games WHERE name=?;',(gameToAdd,)).fetchone()[0]
+
+    userIds = dict()
+    userIds = c.execute('SELECT id FROM Users').fetchall()
+    for user in userIds:
+        userid = user[0]
+        c.execute('INSERT INTO Stats (user, game) VALUES (?,?);',(userid, gameId,))
+    
+    regdb.commit()
     flash(f"Game has been added")
-    return redirect(url_for("get_admin_dashboard"))  
+    return redirect(url_for("get_admin_dashboard")) 
     
 
 

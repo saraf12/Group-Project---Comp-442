@@ -32,9 +32,9 @@ conn = sqlite3.connect(dbpath)
 
 c = conn.cursor()
 
-# c.execute('''
-#             DROP TABLE IF EXISTS Checkers;
-#             ''')
+c.execute('''
+            DROP TABLE IF EXISTS Admin;
+            ''')
 
 
 
@@ -46,6 +46,16 @@ c.execute('''
                 email TEXT,
                 passwordhash TEXT,
                 icon TEXT
+            );
+            ''')
+
+c.execute('''
+            CREATE TABLE IF NOT EXISTS Admins (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE,
+                name TEXT,
+                email TEXT,
+                passwordhash TEXT
             );
             ''')
 
@@ -813,7 +823,7 @@ def post_create_game_cat():
 
     gameToAdd = request.form.get('gamename')
 
-    alreadyExists = c.execute('SELECT id, name FROM Games WHERE name=?',(gameToAdd,)).fetchone()
+    alreadyExists = c.execute('SELECT id, name FROM Games WHERE name=?;',(gameToAdd,)).fetchone()
     if alreadyExists:
         flash(f"Game category entered already exists")
         return redirect(url_for("get_admin_dashboard"))
@@ -837,8 +847,19 @@ def post_create_game_cat():
             ''',(gameToAdd,))
     
     regdb.commit()
+
+    gameId = c.execute('SELECT id FROM Games WHERE name=?;',(gameToAdd,)).fetchone()[0]
+
+    userIds = dict()
+    userIds = c.execute('SELECT id FROM Users').fetchall()
+    for user in userIds:
+        userid = user[0]
+        c.execute('INSERT INTO Stats (user, game) VALUES (?,?);',(userid, gameId,))
+    
+    regdb.commit()
     flash(f"Game has been added")
-    return redirect(url_for("get_admin_dashboard"))    
+    return redirect(url_for("get_admin_dashboard")) 
+
 
 
 # @app.route("/datecreated/<string:gametype>/<int:gameid>", methods=["GET"])
@@ -869,3 +890,54 @@ def get_datecreated(gametype, gameid, expiration):
         # what is returned if get datetime from sql table: '2020-12-01 23:01:59'
         # dateCreated = '2020-12-01 23:01:59'
         return jsonify(dtObject)
+
+
+
+# # making admin table and filling it
+# @app.route("/registeradmin/", methods=["POST"])
+# def post_register_admin():
+#     regdb = get_db()
+#     c = get_db().cursor()
+#     data = dict()
+#     fields = ['username', 'name', 'email', 'password', 'confirm-password']
+#     for field in fields:
+#         data[field] = request.form.get(field)
+#     valid = True
+#     for field in fields:
+#         if data[field] is None or data[field] == "":
+#             valid = False
+#             flash(f"{field} cannot be blank")
+#     if valid and len(data['password']) < 8:
+#         valid = False
+#         flash("password must be at least 8 characters")
+#     if valid and data['password'] != data['confirm-password']:
+#         valid = False
+#         flash("password and confirm password must match")
+#     if valid:
+#         session['email'] = data['email']
+
+#         uid = c.execute('SELECT id FROM Admins WHERE email=?;',(data['email'],)).fetchone()
+
+#         # if a user is found, then this email address is taken
+#         if uid is not None:
+#             flash("An account with this email already exists")
+#             return redirect(url_for("get_register"))
+#         uid = c.execute('SELECT id FROM Admins WHERE username=?;',(data['username'],)).fetchone()
+
+#         # if a user is found, then this email address is taken
+#         if uid is not None:
+#             flash("An account with this username already exists")
+#             return redirect(url_for("get_register"))
+#         # otherwise add them to the database and redirect to login
+#         passtohash = data['password']
+
+#         h = hash_password(data['password'], pep)
+
+#         c.execute('INSERT INTO Admins (username, name, email, passwordhash) VALUES (?,?,?,?);', 
+#             (data['username'], data['name'], data['email'], h))
+
+#         regdb.commit()
+
+#         return redirect(url_for("get_signin"))
+#     else:
+#         return redirect(url_for("get_register"))
