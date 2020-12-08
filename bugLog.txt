@@ -16,3 +16,5 @@ Bug: On the admin page click the create game button with an empty input  would c
 Bug: Couldn't sign into the admin pages. Resolved. High Priority. Submitted by Tirzah Lloyd.
 Bug: Performance rating didn't work for new user. Resolved. High Priority. Submitted by Tirzah Lloyd.
 Bug: Adding to losses increases performance rating instead of decreasing it. Resolved. Medium Priority. Submitted by Tirzah Lloyd.
+Bug: Inbox was only showing a maximum of one sent request. Resolved. High priority. Date reported: 12/8/20. Submitted by Tirzah Lloyd 
+
