@@ -228,7 +228,7 @@ def get_admin_dashboard():
         c = get_db().cursor()
 
         c.execute('''
-            SELECT username, icon FROM USERS;
+            SELECT username, icon, wins, losses FROM USERS;
         ''')
         user = dict()
         game = dict()
@@ -239,6 +239,8 @@ def get_admin_dashboard():
             user[f"{x}"] = r
             x = x + 1
 
+        print(f"{user}")
+
         c.execute('''
             SELECT name FROM Games;
         ''')
@@ -246,15 +248,20 @@ def get_admin_dashboard():
             game[f"{x}"] = r
             x = x + 1
 
-        #.execute('''
-        #    SELECT username, icon FROM Matches;
-        #''')
-        #for r in c: 
-        #    match[f"{x}"] = r
-        #    x = x + 1
+        print(f"{game}")
+
+        c.execute('''
+            SELECT username1, username2, winner FROM Matches;
+        ''')
+
+        for r in c: 
+            match[f"{x}"] = r
+            x = x + 1
+
+        print(f"{match}")
 
         admindb.commit()
-        return render_template("admin_dashboard.html")
+        return render_template("admin_dashboard.html", user = user, game = game, match = match)
 
 @app.route("/create_game/", methods = ["GET"])
 def get_create_game():
