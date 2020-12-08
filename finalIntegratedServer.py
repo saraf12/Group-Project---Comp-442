@@ -905,7 +905,9 @@ def post_create_game_cat():
     if alreadyExists:
         flash(f"Game category entered already exists")
         return redirect(url_for("get_admin_dashboard"))
-    
+    if gameToAdd == "" or gameToAdd is None:
+        flash(f"Add game's name to create the game")
+        return redirect(url_for("get_admin_dashboard"))
     c.execute('''
             CREATE TABLE IF NOT EXISTS {} (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
