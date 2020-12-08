@@ -801,7 +801,7 @@ def get_admin_dashboard():
     #############################
 
 
-    return render_template("SydAdminDash.html", Users=Users, Matches=Matches, games=games, conflict= conflictedList)
+    return render_template("SadminDash.html", Users=Users, Matches=Matches, games=games, conflict= conflictedList)
 
 @app.route("/admin_dashboard/", methods=["POST"])
 def post__admin_dashboard():
