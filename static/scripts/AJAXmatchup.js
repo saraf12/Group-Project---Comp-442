@@ -83,21 +83,21 @@ function refreshCountdown(data) {
   //let gameid = document.getElementById("expiration-btn").value;
   let container = document.getElementById(callingBtnValue);
   //console.log(container.id);
-  /* Uncomment this code after done testing!!!!!
+  // Uncomment this code after done testing!!!!!
   let oneweek = 604800000;
   let weekFromSetup = Date.parse(data) + oneweek;
-  */
   
-  /* Comment this code out after done testing!! */
-  let oneweek = -999999999999;
-  //console.log(Date.parse(data));
-  //DID NOT WORK!!
-  // let now = new Date();
-  // let utc_timestamp = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() , 
-  //     now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
-  // console.log(utc_timestamp);
-  let weekFromSetup = Date.parse(data) + oneweek;
-  console.log(weekFromSetup);
+  
+  // /* Comment this code out after done testing!! */
+  // let oneweek = -999999999999;
+  // //console.log(Date.parse(data));
+  // //DID NOT WORK!!
+  // // let now = new Date();
+  // // let utc_timestamp = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() , 
+  // //     now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
+  // // console.log(utc_timestamp);
+  // let weekFromSetup = Date.parse(data) + oneweek;
+  // console.log(weekFromSetup);
 
   let timeTillExpiration = timebetween(Date.parse(new Date()), weekFromSetup);
   //console.log(timeTillExpiration);
@@ -108,8 +108,7 @@ function refreshCountdown(data) {
   if(timeTillExpiration.includes("-")) {
     container.innerHTML = "Time to report match has expired"
     container.parentElement.previousElementSibling.previousElementSibling.firstElementChild.disabled = true;
-    console.log(container.parentElement.previousElementSibling.previousElementSibling.firstElementChild)
-    //return -1
+    //console.log(container.parentElement.previousElementSibling.previousElementSibling.firstElementChild);
     matchexpired = 1;
   } else{
     container.innerHTML = `Reporting window ends in: ${timeTillExpiration}`

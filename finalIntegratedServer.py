@@ -351,8 +351,8 @@ def profile_page():
     for game in gamesName:
 
         #for Get records from each match
-        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND status=?'.format(game),
-                    (profileData['username'],profileData['username'],"Confirmed",)).fetchall()
+        matchesId = c.execute('SELECT id FROM {} WHERE (username1 =? OR username2=?) AND (status=? OR status=? OR status=?)'.format(game),
+                    (profileData['username'],profileData['username'],"Confirmed", "Done","Expired",)).fetchall()
         recordList = []
         for mId in matchesId:
             match = dict()
@@ -383,6 +383,7 @@ def profile_page():
                     match['win'] = 1
                 else:
                     match['win'] = None
+            match['status'] = c.execute('SELECT status FROM {} WHERE id = ?'.format(game),(mId,)).fetchone()
             recordList.append(match)
         gamesRecords[game] = recordList
         
@@ -390,11 +391,18 @@ def profile_page():
         stats = dict()
         gameID = c.execute('SELECT id FROM Games WHERE name=?',(game,)).fetchone()
         stats["performance"] = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        if stats["performance"] is None:
+            stats["performance"] = 1200
         stats["wins"] = c.execute('SELECT wins FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        if stats["wins"] is None:
+            stats["wins"] = 0
         stats["losses"] = c.execute('SELECT losses FROM Stats WHERE user=? AND game=?',(curr_uid,gameID,)).fetchone()
+        if stats["losses"] is None:
+            stats["losses"] = 0
         gameStats[game] = stats
 
     return render_template("profile.html", profileData=profileData,gameStats=gameStats, gamesRecords = gamesRecords, gameslst = gamesName)
+
 
 
 
