@@ -27,3 +27,15 @@ Software to install to be able to run the program:
     
 
 -User signin using http://localhost:5000/signin/ or choose to create an account
+
+Existing users that can be used for testing purposes:
+username: gamer2000, password: letsplay
+username: highscorer18, password: playagame
+username: blade750, password: herewego
+
+To access admin side:
+-Type "admin" into username field of regular signin page, leave password blank, and hit submit
+-At login page use these credentials:
+username: theboss, password: incontrol
+
+Quirk about adding games: the game name must include no spaces!!

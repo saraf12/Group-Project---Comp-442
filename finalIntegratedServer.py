@@ -28,7 +28,7 @@ mail = Mail(app)
 
 scriptdir = os.path.dirname(__file__)
 
-dbpath = os.path.join(scriptdir, "matchingsite.sqlite3")
+dbpath = os.path.join(scriptdir, "thirdpartymatching.sqlite3")
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -47,7 +47,7 @@ conn = sqlite3.connect(dbpath)
 c = conn.cursor()
 
 # c.execute('''
-#             DROP TABLE IF EXISTS Games;
+#             DROP TABLE IF EXISTS Uno;
 #             ''')
 
 
@@ -106,7 +106,7 @@ conn.commit()
 #             ''')
 
 # c.execute('''
-#             UPDATE TicTacToe SET status="Requested" WHERE id=1;
+#             UPDATE Stats SET performanceRating=1500 WHERE id=5;
 #             ''')
 
 conn.commit()
@@ -460,7 +460,9 @@ def updaterecord():
 
          #Code to increment wins or losses and total Games
         gameId = c.execute('SELECT id FROM Games WHERE name=?',(game,)).fetchone()[0]
-        if result == currUsername:
+        if result == "NeverPlayed" :
+            pass
+        elif result == currUsername:
             c.execute('UPDATE Stats SET wins = wins+1 WHERE user=? AND game=?;',(curr_uid, gameId,))
             #Code to update performanceRating
             opponentUserId = c.execute('SELECT id FROM Users WHERE username=?;',(opponentUsername,)).fetchone()[0]
@@ -470,6 +472,7 @@ def updaterecord():
             newPR = additionToPR + currentUserPR
             newPR = str(newPR)
             c.execute('UPDATE Stats SET performanceRating=? WHERE user=? AND game=?;',(newPR, curr_uid, gameId,))
+            c.execute('UPDATE Stats SET totGamesPlayed = totGamesPlayed+1 WHERE user=? AND game=?;',(curr_uid, gameId,))
         else:
             c.execute('UPDATE Stats SET losses = losses+1 WHERE user=? AND game=?;',(curr_uid, gameId,))
             #Code to update performanceRating
@@ -477,10 +480,10 @@ def updaterecord():
             opponentPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(opponentUserId, gameId,)).fetchone()[0]
             additionToPR = decimal.Decimal(opponentPR) * decimal.Decimal(0.25)
             currentUserPR = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(curr_uid, gameId,)).fetchone()[0]
-            newPR = additionToPR + currentUserPR
+            newPR = currentUserPR - additionToPR
             newPR = str(newPR)
             c.execute('UPDATE Stats SET performanceRating=? WHERE user=? AND game=?;',(newPR, curr_uid, gameId,))
-        c.execute('UPDATE Stats SET totGamesPlayed = totGamesPlayed+1 WHERE user=? AND game=?;',(curr_uid, gameId,))
+            c.execute('UPDATE Stats SET totGamesPlayed = totGamesPlayed+1 WHERE user=? AND game=?;',(curr_uid, gameId,))
 
     regdb.commit()
     return redirect(url_for("profile_page"))
@@ -682,10 +685,10 @@ def get_inbox():
 
     allTypesOfGames = c.execute('SELECT id, name FROM Games;').fetchall()
 
+    i = 0
     for game in allTypesOfGames:
         gamesWithUserAsRequester = c.execute('SELECT id, username2, dateCreated, status FROM {} WHERE username1=?;'.format(game[1]),
                     (currUsername,)).fetchall()
-        i = 0
         for gm in gamesWithUserAsRequester:
             requesterOfGames[i] = (game[1], gm)
             i = i+1
@@ -733,10 +736,6 @@ def post_inbox():
 
 @app.route("/admin_dashboard/", methods = ["GET"])
 def get_admin_dashboard():
-    # curr_uid = session.get("uid")
-    # if curr_uid == "":
-    #     flash("Please sign in")
-    #     return redirect(url_for("get_signin"))
     regdb = get_db()
     c = get_db().cursor()
     Matches = dict()
@@ -814,66 +813,26 @@ def post__admin_dashboard():
     game = request.form.get("game")
     mId = request.form.get("matchID")
 
-    c.execute('UPDATE {} SET winnerAccordingToU1=? WHERE id=?'.format(game),(wuser1,mId))
-    c.execute('UPDATE {} SET winnerAccordingToU2=? WHERE id=?'.format(game),(wuser2,mId))
-    c.execute('UPDATE {} SET status=? WHERE id=?'.format(game),(status,mId))
-
-    
+    if game is not None:
+        c.execute('UPDATE {} SET winnerAccordingToU1=? WHERE id=?'.format(game),(wuser1,mId))
+        c.execute('UPDATE {} SET winnerAccordingToU2=? WHERE id=?'.format(game),(wuser2,mId))
+        c.execute('UPDATE {} SET status=? WHERE id=?'.format(game),(status,mId))    
 
     uuser = request.form.get("Uuser")
     ugame = request.form.get("Ugame")
     uwin = request.form.get("Uwin")
     ulosses = request.form.get("Ulosses")
 
-    c.execute('UPDATE Stats SET wins=? WHERE user=? AND game=?',(uwin, uuser, ugame))
-    c.execute('UPDATE Stats SET losses=? WHERE user=? AND game=?',(ulosses, uuser, ugame))
+    if uwin is not None and ulosses is not None:
+        totalgames = decimal.Decimal(uwin) + decimal.Decimal(ulosses)
+        totalgames = str(totalgames)
+
+        c.execute('UPDATE Stats SET wins=? WHERE user=? AND game=?',(uwin, uuser, ugame))
+        c.execute('UPDATE Stats SET losses=? WHERE user=? AND game=?',(ulosses, uuser, ugame))
+        c.execute('UPDATE Stats SET totGamesPlayed=? WHERE user=? AND game=?',(totalgames, uuser, ugame))
 
     regdb.commit()
     return redirect(url_for("get_admin_dashboard"))
-
-@app.route("/win_loss/", methods = ["GET"])
-def get_win_loss():
-    changedb = get_db()
-    c = get_db().cursor()
-
-    x = 1
-    data = dict()
-
-    c.execute('''
-            SELECT id FROM Users;
-                ''')
-    for r in c:
-        data[f"{x}"] = r
-        x = x + 1
-        
-    print(f"{data}")
-    
-    changedb.commit()
-    return render_template("win_loss.html", data = data)
-
-@app.route("/win_loss/", methods = ["POST"])
-def change_win_loss():
-    changedb = get_db()
-    c = get_db().cursor()
-
-    data = dict()
-
-    fields = ['id', 'win', 'loss']
-
-    for field in fields:
-        data[field] = request.form.get(field)
-        print(f"{data}")
-
-    print(f"{data}")
-
-    c.execute(''' Update Stats
-                SET wins = ?, losses = ?
-                WHERE id = ?;
-             ''',(data['win'], data['loss'], data['id'],))
-
-    data.clear()
-    changedb.commit()
-    return redirect(url_for("change_win_loss"))
 
 
 @app.route("/admin_create_game/", methods = ["POST"])
