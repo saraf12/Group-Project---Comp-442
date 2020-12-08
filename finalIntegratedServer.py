@@ -874,10 +874,6 @@ def change_win_loss():
 
 @app.route("/admin_create_game/", methods = ["POST"])
 def post_create_game_cat():
-    curr_uid = session.get("uid")
-    if curr_uid == "":
-        flash("Please sign in")
-        return redirect(url_for("get_signin"))
     regdb = get_db()
     c = get_db().cursor()
 
@@ -908,7 +904,8 @@ def post_create_game_cat():
     
     regdb.commit()
     flash(f"Game has been added")
-    return redirect(url_for("get_admin_dashboard"))    
+    return redirect(url_for("get_admin_dashboard"))  
+    
 
 
 @app.route("/datecreated/<string:gametype>/<int:gameid>/<int:expiration>", methods=["GET"])
