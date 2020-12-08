@@ -28,7 +28,7 @@ mail = Mail(app)
 
 scriptdir = os.path.dirname(__file__)
 
-dbpath = os.path.join(scriptdir, "matchingsite.sqlite3")
+dbpath = os.path.join(scriptdir, "thirdpartymatching.sqlite3")
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -261,7 +261,6 @@ def post_admin():
         if uid is not None and savedhash is not None: 
             if check_password(passwordtxt, savedhash[0], pep):
                 adminExpires = datetime.utcnow()+timedelta(minutes=30)
-                session['uid'] = uid[0]
                 session['admin-expires'] = adminExpires.strftime("%Y-%m-%dT%H:%M:%SZ")
                 return redirect(url_for("get_admin_dashboard"))
             else:
