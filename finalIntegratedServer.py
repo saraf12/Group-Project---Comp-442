@@ -2,6 +2,7 @@ import sqlite3
 import os
 import base64
 import time
+import decimal
 from datetime import datetime, timedelta
 from traceback import print_exc
 from cryptography.fernet import Fernet
@@ -852,10 +853,5 @@ def get_datecreated(gametype, gameid, expiration):
         dtObject = c.execute('SELECT dateCreated FROM {} WHERE id=?;'.format(gametype),(gameid,)).fetchone()
         if dtObject is not None and dtObject != "":
             dtObject = dtObject[0]  
-
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        dateStr = "2020-12-06 03:33:00"
-        print(dtObject)
         
         return jsonify(dtObject)
