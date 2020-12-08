@@ -598,6 +598,7 @@ def post_matchup_window_accept():
     c.execute('INSERT INTO {} (username1, username2, status) VALUES (?,?,?);'.format(gameTableName),
                     (currentUsername, opponentUsername, "Requested",))
     # Send email to notify of request
+    OppEmail = c.execute('SELECT email FROM users WHERE username=?',(opponentUsername,)).fetchone()[0]
     msg = Message(
         sender=app.config.get("MAIL_USERNAME"),
         recipients=[OppEmail],
@@ -605,7 +606,7 @@ def post_matchup_window_accept():
         body= str(currentUsername) + ' Requested a Match of ' + str(gameTableName) + '.<br> Please go online to accept or refuse!'
     )
     mail.send(msg)
-    
+
     regdb.commit()
     return redirect(url_for("match_accepted"))
 
