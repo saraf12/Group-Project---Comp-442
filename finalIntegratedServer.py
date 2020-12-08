@@ -28,7 +28,7 @@ mail = Mail(app)
 
 scriptdir = os.path.dirname(__file__)
 
-dbpath = os.path.join(scriptdir, "thirdpartymatching.sqlite3")
+dbpath = os.path.join(scriptdir, "matchingsite.sqlite3")
 
 def get_db():
     db = getattr(g, '_database', None)
