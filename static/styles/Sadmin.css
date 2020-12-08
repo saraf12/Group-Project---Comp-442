@@ -1,0 +1,41 @@
+body{
+    background-color:  lightgray;
+    font-family: Tahoma, Verdana, Segoe, sans-serif;
+}
+
+h2 {
+    background-color:  #24abbd;
+    padding: 1rem;
+    text-align: center;
+}
+
+button{
+    background-color: #ffa07a;
+    text-align: center;
+}
+
+th{
+    text-align: center;
+}
+
+/* .table{
+    display: none;
+} */
+
+.main{
+    display: flex;
+}
+.sideBar{
+    background-color: #24abbd;
+    padding-top: 5%;
+}
+
+.tab{    
+    margin-top: 5%;
+    width: 100%;
+    background-color: lightgray;
+}
+
+header{
+    text-align: right;
+}

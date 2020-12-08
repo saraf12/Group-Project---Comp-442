@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <title> Inbox/Sent </title>
-    <script src="../static/scripts/Sadmin.js"></script>
+    
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -40,8 +40,8 @@
     </form>
     </div>
 
-    <!-- ALL users  -->
 	<h1>All Users</h1>
+
 	{% if Users %}
 	<table class="table">
 		<tbody>
@@ -49,41 +49,14 @@
 				<th>Username</th>
 				<th>Name</th>
                 <th>Email</th>
-                <th>Games</th>
-                <th>Win</th>
-                <th>Losses</th>
 			</tr>
-            {% for user in Users %}
+            {% for user in Users.values() %}
             {% if user %}
 			<tr>
-				<td>{{ user["username"] }}</td>
-				<td>{{ user["name"] }}</td>
-                <td>{{ user["email"] }}</td>
-                
-                
+				<td>{{ user[0] }}</td>
+				<td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
             </tr>
-            {% for g in user["games"] %}
-            <form action = "/admin_dashboard/" method = "POST">
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        {{g["name"]}}
-                        <input type="hidden" name="Ugame" value='{{g["id"]}}'>
-                        <input type="hidden" name="Uuser" value='{{user["id"]}}'>
-                    </td>
-                    <td>
-                        <input type="number" name="Uwin" value='{{g["win"]}}'>
-                    </td>
-                    <td>
-                        <input type="number" name="Ulosses" value='{{g["losses"]}}'>
-                    </td> 
-                    <td><button type="submit" formmethod="post">Submit</button></td>
-                </tr>
-            </form>
-            {% endfor %}
-
             {% endif %}
 			{% endfor %}
 		</tbody>
@@ -93,7 +66,7 @@
 	<h2>No registered users</h2>
     {% endif %}
 
-    <!-- Games -->
+
     <h1>Games</h1>
 
 	{% if Matches %}
