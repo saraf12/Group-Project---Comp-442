@@ -6,10 +6,12 @@ Bug: Columns for performanceRating, wins, and losses are not auto filling with z
 Bug: Log out link on opposite side of page from profile icon. Open. Low priority. Date reported: 11/20/2020. Submitted by Tirzah Lloyd.
 Bug: Unless a color is explicitly selected, the profile icon is changed to black after any changes on edit profile page are saved. Closed. Low priority. Date reported: 11/20/2020.  Submitted by Tirzah Lloyd.
 
-
 Bug: Leaderboard doesn't show the correct info. Closed. High Priority. Date reported: 11/29/20. Submitted by Tirzah Lloyd.
 Bug: Opponent data in matchup window is currently hard coded and not actually picking an opponent. Closed. High Priority. Date reported: 11/29/20. Submitted by Tirzah Lloyd.
 
-
 Bug: UpdateRecord Button on profile page has to be clicked twice before showing the records. Resolved. Medium priority. Submitted by Tirzah Lloyd.
-Bug: Records was showed only for the first game in the profile page. Resolved. Submitted by Sydnee Charles.
+Bug: Records was showed only for the first game in the profile page. Resolved. High Priority. Submitted by Sydnee Charles.
+Bug: On the admin page click the create game button with an empty input  would crash the server. Resolved. High Priority. Submitted by Sydnee Charles.
+Bug: Couldn't sign into the admin pages. Resolved. High Priority. Submitted by Tirzah Lloyd.
+Bug: Performance rating didn't work for new user. Resolved. High Priority. Submitted by Tirzah Lloyd.
+Bug: Adding to losses increases performance rating instead of decreasing it. Resolved. Medium Priority. Submitted by Tirzah Lloyd.
