@@ -7,9 +7,23 @@ from traceback import print_exc
 from cryptography.fernet import Fernet
 from passlib.hash import bcrypt_sha256
 from flask import Flask, render_template, request, redirect, url_for, abort, session, flash, g, jsonify, make_response
+from flask_mail import Mail, Message
+
 app = Flask(__name__)
+
+mail_settings = {
+    "MAIL_SERVER": 'smtp.gmail.com',
+    "MAIL_PORT": 465,
+    "MAIL_USE_TLS": False,
+    "MAIL_USE_SSL": True,
+    "MAIL_USERNAME": 'noreplythirdpartymatchmaker@gmail.com',
+    "MAIL_PASSWORD": 'Comp442A'
+}
+app.config.update(mail_settings)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config["SECRET_KEY"] = "correcthorsebatterystaple"
+
+mail = Mail(app)
 
 scriptdir = os.path.dirname(__file__)
 
@@ -582,7 +596,15 @@ def post_matchup_window_accept():
 
     c.execute('INSERT INTO {} (username1, username2, status) VALUES (?,?,?);'.format(gameTableName),
                     (currentUsername, opponentUsername, "Requested",))
-
+    # Send email to notify of request
+    msg = Message(
+        sender=app.config.get("MAIL_USERNAME"),
+        recipients=[OppEmail],
+        subject = str(currentUsername) + ' Requested a Match of ' + str(gameTableName),
+        body= str(currentUsername) + ' Requested a Match of ' + str(gameTableName) + '.<br> Please go online to accept or refuse!'
+    )
+    mail.send(msg)
+    
     regdb.commit()
     return redirect(url_for("match_accepted"))
 
