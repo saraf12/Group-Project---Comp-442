@@ -682,15 +682,6 @@ def get_admin_dashboard():
     #     return redirect(url_for("get_signin"))
     regdb = get_db()
     c = get_db().cursor()
-
-    Users = dict()
-
-    userlist = c.execute('SELECT username, name, email FROM Users;').fetchall()
-    i = 0
-    for record in userlist:
-        Users[i] = record
-        i = i+1
-
     Matches = dict()
     
     allTypesOfGames = c.execute('SELECT id, name FROM Games;').fetchall()
@@ -702,6 +693,34 @@ def get_admin_dashboard():
             Matches[i] = (game[1], gm)
             i = i+1
 
+
+
+    regdb.row_factory = lambda cursor, row: row[0]
+    c = regdb.cursor()
+
+    Users = []
+
+    userlist = c.execute('SELECT id FROM Users;').fetchall()
+    gameId = c.execute('SELECT id FROM Games;').fetchall()
+    fields = ['username, name, email, games']
+    for uid in userlist:
+        user = dict()
+        user['id'] = uid
+        user['username'] = c.execute('SELECT username FROM Users WHERE id=?;',(uid,)).fetchone()
+        user['name'] = c.execute('SELECT name FROM Users WHERE id=?;',(uid,)).fetchone()
+        user['email'] = c.execute('SELECT email FROM Users WHERE id=?;',(uid,)).fetchone()
+        user['games'] = []
+        for gid in gameId:
+            games = dict()
+            games["id"] = gid
+            games['name'] = c.execute('SELECT name FROM Games WHERE id=?;',(gid,)).fetchone()
+            games['performance'] = c.execute('SELECT performanceRating FROM Stats WHERE user=? AND game=?;',(uid,gid,)).fetchone()
+            games['win'] = c.execute('SELECT wins FROM Stats WHERE user=? AND game=?;',(uid,gid,)).fetchone()
+            games['losses'] = c.execute('SELECT losses FROM Stats WHERE user=? AND game=?;',(uid,gid,)).fetchone()
+            user['games'].append(games)
+        Users.append(user)
+
+    
 
     #############################
     regdb.row_factory = lambda cursor, row: row[0]
@@ -725,7 +744,10 @@ def get_admin_dashboard():
         conflictedList[g] = conflicList
     #############################
 
-    return render_template("SadminDash.html", Users=Users, Matches=Matches, games=games, conflict= conflictedList)
+    stats = dict()
+    
+
+    return render_template("SydAdminDash.html", Users=Users, Matches=Matches, games=games, conflict= conflictedList)
 
 @app.route("/admin_dashboard/", methods=["POST"])
 def post__admin_dashboard():
@@ -741,8 +763,19 @@ def post__admin_dashboard():
     c.execute('UPDATE {} SET winnerAccordingToU2=? WHERE id=?'.format(game),(wuser2,mId))
     c.execute('UPDATE {} SET status=? WHERE id=?'.format(game),(status,mId))
 
+    
+
+    uuser = request.form.get("Uuser")
+    ugame = request.form.get("Ugame")
+    uwin = request.form.get("Uwin")
+    ulosses = request.form.get("Ulosses")
+
+    c.execute('UPDATE Stats SET wins=? WHERE user=? AND game=?',(uwin, uuser, ugame))
+    c.execute('UPDATE Stats SET losses=? WHERE user=? AND game=?',(ulosses, uuser, ugame))
+
     regdb.commit()
     return redirect(url_for("get_admin_dashboard"))
+
 
 @app.route("/win_loss/", methods = ["GET"])
 def get_win_loss():
