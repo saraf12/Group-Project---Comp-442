@@ -323,8 +323,9 @@ width: 100%;
   transition: all 300ms ease-in-out;
   display: block;
   font-family: 'Nunito', sans-serif;
-  margin-top: 50px;
-  margin-right: 60px;
+  margin-bottom: 10px;
+  margin-top: 0px;
+  margin-left: 30px;
 }
 
 .edit-btn:hover {
@@ -375,8 +376,6 @@ width: 100%;
 }
 
 .num_container input{
-    width: 0px;
-    font-size: 20px;
     margin: 0 10px!important;
     padding: 10px;
     border: none;
@@ -386,4 +385,32 @@ width: 100%;
 .num_container input:hover{
     background: #c9c0a6;
     color: #fff;
+}
+
+.num_track_container input{
+  font-size: 20px;
+  margin: 0 10px!important;
+  padding: 10px;
+  border: none;
+  outline: none;
+}
+
+.num_track_container input:hover{
+  background: #c9c0a6;
+  color: #fff;
+}
+
+.num_container select{
+  width: 200px;
+  font-size: 20px;
+  margin: 0 10px!important;
+  padding: 10px;
+  margin-bottom: 20px!important;
+  border: none;
+  outline: none;
+}
+
+.num_container select:hover{
+  background: #c9c0a6;
+  color: #fff;
 }

@@ -70,13 +70,14 @@
             <h1 class = "section_title"> Matches </h1>
         </div>
 
+        {% for i in Users.values() %}
         <div class = "card-wrapper">
             <div class="matches-card">
                 <div class="matches_icon_left">
                     <img src="../static/avatar/001-man.png" alt="">
                 </div>
                 <div id = "one" class = "left_box">
-                    <h1 style = "float: right;"> Dark Tape Demos: 0 &nbsp; </h1>
+                    <h1 style = "float: right;"> {{i.1}}: 0 &nbsp; </h1>
                     <p style = "float: right;"> Wins: 12 Losses: 14 &nbsp; </p>
                 </div>
             
@@ -85,7 +86,7 @@
                 </div>
 
                 <div id = "three" class = "right_box">
-                    <h1 style = "float: left;"> &nbsp; 0 : Certified Lover Boy </h1>
+                    <h1 style = "float: left;"> &nbsp; 0 : {{i.2}} </h1>
                     <p style = "float: left;"> &nbsp; Wins: 24 Losses: 11 </p>
                 </div>
 
@@ -98,92 +99,7 @@
                 </div>
             </div>
         </div>
-        <div class = "card-wrapper">
-            <div class="matches-card">
-                <div class="matches_icon_left">
-                    <img src="../static/avatar/011-woman.png" alt="">
-                </div>
-                <div id = "one" class = "left_box">
-                    <h1 style = "float: right;"> Dank Meme Demos: 0 &nbsp; </h1>
-                    <p style = "float: right;"> Wins: 11 Losses: 24 &nbsp; </p>
-                </div>
-            
-                <div id = "two" class = "smaller_box">
-                    <h1 style = "float: right;"> vs </h1>
-                </div>
-
-                <div id = "three" class = "right_box">
-                    <h1 style = "float: left;"> &nbsp; 0 : Kiss Sour Melons </h1>
-                    <p style = "float: left;"> &nbsp; Wins: 1 Losses: 4 </p>
-                </div>
-
-                <div class="matches_icon_right">
-                    <img src="../static/avatar/012-woman.png" alt="">
-                </div>
-            
-                <div id = "four" class = "under_box">
-                    <p style = " text-align: center; margin-top:5px;"> Game: Street Fighters </p>
-                </div>
-            </div>
-        </div>
-
-        <div class = "card-wrapper">
-            <div class="matches-card">
-                <div class="matches_icon_left">
-                    <img src="../static/avatar/013-woman.png" alt="">
-                </div>
-                <div id = "one" class = "left_box">
-                    <h1 style = "float: right;"> Certified Lover Girl: 0 &nbsp; </h1>
-                    <p style = "float: right;"> Wins: 11 Losses: 24 &nbsp; </p>
-                </div>
-            
-                <div id = "two" class = "smaller_box">
-                    <h1 style = "float: right;"> vs </h1>
-                </div>
-
-                <div id = "three" class = "right_box">
-                    <h1 style = "float: left;"> &nbsp; 0 : Certified Lover Boy </h1>
-                    <p style = "float: left;"> &nbsp; Wins: 11 Losses: 24 </p>
-                </div>
-
-                <div class="matches_icon_right">
-                    <img src="../static/avatar/014-woman.png" alt="">
-                </div>
-            
-                <div id = "four" class = "under_box">
-                    <p style = " text-align: center; margin-top:5px;"> Game: Tekken </p>
-                </div>
-            </div>
-        </div>
-
-        <div class = "card-wrapper">
-            <div class="matches-card">
-                <div class="matches_icon_left">
-                    <img src="../static/avatar/015-woman.png" alt="">
-                </div>
-                <div id = "one" class = "left_box">
-                    <h1 style = "float: right;"> Certified Lover Girl: 0 &nbsp; </h1>
-                    <p style = "float: right;"> Wins: 11 Losses: 24 &nbsp; </p>
-                </div>
-            
-                <div id = "two" class = "smaller_box">
-                    <h1 style = "float: right;"> vs </h1>
-                </div>
-
-                <div id = "three" class = "right_box">
-                    <h1 style = "float: left;"> &nbsp; 0 : King Kong's lover </h1>
-                    <p style = "float: left;"> &nbsp; Wins: 11 Losses: 24 </p>
-                </div>
-
-                <div class="matches_icon_right">
-                    <img src="../static/avatar/016-woman.png" alt="">
-                </div>
-            
-                <div id = "four" class = "under_box">
-                    <p style = " text-align: center; margin-top:5px;"> Game: Super Smash Bros. </p>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
         <!--===== MAIN JS =====-->
         <script src="../static/scripts/admin.js"></script>
     </body>

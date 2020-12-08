@@ -13,7 +13,7 @@ app.config["SECRET_KEY"] = "correcthorsebatterystaple"
 
 scriptdir = os.path.dirname(__file__)
 
-dbpath = os.path.join(scriptdir, "Jed01.sqlite3")
+dbpath = os.path.join(scriptdir, "gamematching.sqlite3")
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -129,7 +129,10 @@ def post_register():
     regdb = get_db()
     c = get_db().cursor()
     data = dict()
-    fields = ['username', 'name', 'email', 'password', 'confirm-password', 'Iprofile']
+
+    #fields = ['username', 'name', 'email', 'password', 'confirm-password', 'Iprofile']
+
+    fields = ['username', 'name', 'email', 'password', 'confirm-password']
     for field in fields:
         data[field] = request.form.get(field)
     valid = True
@@ -140,6 +143,9 @@ def post_register():
     if valid and len(data['password']) < 8:
         valid = False
         flash("password must be at least 8 characters")
+    if valid and len(data['username']) < 8:
+        valid = False
+        flash("username must be at least 8 characters")
     if valid and data['password'] != data['confirm-password']:
         valid = False
         flash("password and confirm password must match")
@@ -163,8 +169,11 @@ def post_register():
 
         h = hash_password(data['password'], pep)
 
-        c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
-            (data['username'], data['name'], data['email'], h, "you"))
+        #c.execute('INSERT INTO Users (username, name, email, passwordhash, icon) VALUES (?,?,?,?,?);', 
+        #    (data['username'], data['name'], data['email'], h, "you"))
+
+        c.execute('INSERT INTO Users (username, name, email, passwordhash) VALUES (?,?,?,?);', 
+            (data['username'], data['name'], data['email'], h))
         regdb.commit()
 
         return redirect(url_for("get_signin"))
@@ -290,45 +299,11 @@ def post_create_game():
     regdb.commit()
     return redirect(url_for("get_admin_games"))
 
-@app.route("/delete_game/", methods = ["GET"])
-def get_delete_game():
-    return render_template("admin_dash_games.html")
-
-@app.route("/delete_game/", methods = ["POST"])
-def post_delete_game():
-    admindb = get_db()
-    c = get_db().cursor()
-
-    gameToDelete = request.form.get('gamename')
-
-    c.execute(''' 
-                DROP TABLE {};    
-                 ''').format(gameToDelete)
-
-    admindb.commit()
-    return render_template("admin_dash_games.html")
-
-@app.route("/win_loss/", methods = ["GET"])
+@app.route("/stats/", methods = ["GET"])
 def get_win_loss():
-    changedb = get_db()
-    c = get_db().cursor()
+    return render_template("admin_dash_user.html")
 
-    x = 1
-    data = dict()
-
-    c.execute('''
-            SELECT id FROM Users;
-                ''')
-    for r in c:
-        data[f"{x}"] = r
-        x = x + 1
-        
-    print(f"{data}")
-    
-    changedb.commit()
-    return render_template("win_loss.html", data = data)
-
-@app.route("/win_loss/", methods = ["POST"])
+@app.route("/stats/", methods = ["POST"])
 def change_win_loss():
     changedb = get_db()
     c = get_db().cursor()
@@ -340,70 +315,85 @@ def change_win_loss():
 
     for field in fields:
         data[field] = request.form.get(field)
-        print(f"{data}")
+        print(f"{data[field]}")
 
     print(f"{data}")
+    print(f"{data['id']}")
+    print(f"{data['win']}")
+    print(f"{data['loss']}")
 
-    c.execute(''' Update Stats
+    c.execute(''' Update Users
                 SET wins = ?, losses = ?
                 WHERE id = ?;
              ''',(data['win'], data['loss'], data['id'],))
 
+    c.execute(''' Update Stats
+                SET wins = ?, losses = ?
+                WHERE user = ?;
+             ''',(data['win'], data['loss'], data['id'],))
+
     data.clear()
     changedb.commit()
-    return redirect(url_for("change_win_loss"))
-
-@app.route("/ban_user/", methods = ["GET"])
-def get_ban_user():
-    changedb = get_db()
-    c = get_db().cursor()
-
-    x = 1
-    data = dict()
-    copy = dict()
-
-    fields = ['id'];
-
-    c.execute('''
-            SELECT id FROM Users;
-            ''')
-
-    for r in c:
-        data[f"{x}"] = r
-        x = x + 1
-
-    print(f"{data}")
-    changedb.commit()
-    return render_template("ban_user.html", data = data)
-
-@app.route("/ban_user/", methods = ["POST"])
-def post_ban_user():
-    changedb = get_db()
-    c = get_db().cursor()
-
-    fields = ['id'];
-    data = dict()
-
-    for field in fields:
-        data[field] = request.form.get(field)
-
-    print(f"{data}")
-    c.execute(''' Delete FROM Users where id = ?;''', (data['id'],))
-
-    changedb.commit()
-    return redirect(url_for("post_ban_user"))
+    return redirect(url_for("get_admin_user"))
 
 @app.route("/admin_dashboard_users/", methods = ["GET"])
 def get_admin_user():
-    return render_template("admin_dash_user.html")
+    changedb = get_db()
+    c = get_db().cursor()
+
+    Users = dict()
+
+    userlist = c.execute('SELECT id, name, wins, losses, icon FROM Users;').fetchall()
+    
+    i = 0
+    for record in userlist:
+        Users[i] = record
+        i = i + 1
+    #for field in fields:
+    #   data[field] = 
+
+    changedb.commit()
+    return render_template("admin_dash_user.html", Users = Users)
 
 @app.route("/admin_dashboard_games/", methods = ["GET"])
 def get_admin_games():
-    return render_template("admin_dash_games.html")
+    changedb = get_db()
+    c = get_db().cursor()
+
+    Users = dict()
+
+    userlist = c.execute('SELECT id, name FROM Games;').fetchall()
+    
+    i = 0
+    for record in userlist:
+        Users[i] = record
+        i = i + 1
+    #for field in fields:
+    #   data[field] = 
+
+    changedb.commit()
+    return render_template("admin_dash_games.html", Users = Users)
 
 @app.route("/admin_dashboard_matches/", methods = ["GET"])
 def get_admin_matches():
-    return render_template("admin_dash_matches.html")
+    changedb = get_db()
+    c = get_db().cursor()
+
+    Users = dict()
+
+    userlist = c.execute('SELECT id, username1, username2, winner FROM Matches;').fetchall()
+    #we should save the game they are playing
+
+    i = 0
+    for record in userlist:
+        Users[i] = record
+        i = i + 1
+    #for field in fields:
+    #   data[field] = 
+
+
+    changedb.commit()
+    return render_template("admin_dash_matches.html", Users = Users)
 
 if __name__ == '__main__':
     app.run(debug=True)

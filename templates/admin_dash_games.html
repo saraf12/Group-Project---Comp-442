@@ -105,24 +105,18 @@
                     <button id="open-popup-btn" class = "add-btn">
                         <i class = "fas fa-plus"></i>
                       </button>
-
                 </div>
             </div>
+
+            {% for i in Users.values() %}
             <div class = "card-wrapper">
                 <div class="user-card">
                     <div class="wheather-icon sun"></div>
-                    <h1> Super Mario Kart </h1>
+                    <h1> {{i.1}} </h1>
                     <p> Number of plays: 1124 </p>
                 </div>
             </div>
-
-            <div class = "card-wrapper">
-                <div class="user-card">
-                    <div class="weather-icon cloud"></div>
-                    <h1> Mortal Kombat </h1>
-                    <p> Number of plays: 4040</p>
-                </div>
-            </div>
+            {% endfor %}
         </div>
 
         <!--===== MAIN JS =====-->

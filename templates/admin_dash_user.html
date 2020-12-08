@@ -8,7 +8,6 @@
 
         <!-- ==== BOX ICONS ===== -->
         <script src="https://kit.fontawesome.com/db6a3a4fde.js" crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
         <!-- ==== CSS =====-->
         <link rel = "stylesheet" href = "../static/styles/data_dash.css">
@@ -16,15 +15,10 @@
         <link rel = "stylesheet" href = "../static/styles/modal_edit_user.css"> 
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-        <link rel = "stylesheet" href = "jquery.nice-number.css">
-        <script src="./jquery.nice-number.js"></script> 
+        <!--<link rel = "stylesheet" href = "jquery.nice-number.css">
+        <script src="./jquery.nice-number.js"></script> -->
 
         <!--===== MODAL WIDGET ====-->
-        <script>
-            $(function(){
-                $('input[type = "number"]').niceNumber();
-            });
-        </script>
     </head>
     <body id="body-pd">
         <header class="header" id="header">
@@ -77,50 +71,36 @@
         </div>
 
         <!--===== WIDGETS =====-->
+            
         <div>
-            <div class = "main_container">
-                <div class = "modal_header">
-                    <h2> Ban user </h2>
-                </div>
-                
-                <form class = "form_num" id = "form" method = "post" action = "/win_loss" >
-                    <div class = "submit">
-                        <div class="submit-btn">
-                            <button id="submit-popup-btn" type = "submit" formmethod="POST">
-                                Get outta here!
-                            </button>
-                        </div>
-                    </div>
-                </form>
-                
-                <div class = "cancel">
-                    <div class="dismiss-btn">
-                        <button id="del-dismiss-popup-btn">
-                            Ah, never mind
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <div class = "section_header">
+                <h1 class = "section_title"> Users </h1>
 
-        </div>
-
-        <!--===== WIDGETS =====-->
-        <div>
+            <div class = "modal">
             <div class = "num_container">
                 <div class = "modal_header">
                     <h2> Edit Users Game Stats </h2>
                 </div>
                 
-                <form class = "form" id = "form" method = "post" action = "/win_loss" >
+                <form class = "form" id = "form" method = "post" action = "/stats" >
                     <!--==== MODAL NUMBER ====-->
+                    <label> User: </label>
+
+                    <select name="id" id="id">
+                        {% for i in Users.values() %}
+                        {{i}}
+                            <option value="{{i.0}}"> {{i.0}} </option>
+                        {% endfor %}
+                    </select>
+
                     <div class = "num_track_container">
                         <label for = ""> Wins </label>
-                        <input type="number" name="wins" id="" value = "1" min = "1">
+                        <input type="number" name="win" id="" value = "1" min = "1">
                     </div>
                     
                     <div class = "num_track_container">
                         <label for = ""> Loss </label>
-                        <input type="number" name="wins" id="" value = "1" min = "1">
+                        <input type="number" name="loss" id="" value = "1" min = "1">
                     </div>
                     
                     <div class="submit-btn">
@@ -139,48 +119,28 @@
                     </div>
                 </div>
             </div>
-    
-        </div>
 
-
-        <div>
-            <div class = "section_header">
-                <h1 class = "section_title"> Users </h1>
+                <button id="edit-open-popup-btn" class = "edit-btn" style="float: right;">
+                    <i class = "fas fa-pencil-alt"></i>
+                </button>
+                </div>
             </div>
 
+            {% for i in Users.values() %}
             <span class = "card-wrapper">
                 <div class="user-card">
 
                     <div class="float-right">
-                        <img src="../static/avatar/010-woman.png" alt="">
+                        <img src = "../static/userIcon/{{i.4}}" alt="">
                     </div>
-  
-                    <button id="del-open-popup-btn" class = "edit-btn" style="float: right;">
-                        <i class = "fas fa-ban"></i>
-                    </button>
 
-                    <button id="edit-open-popup-btn" class = "edit-btn" style="float: right;">
-                        <i class = "fas fa-pencil-alt"></i>
-                    </button>
-                    
-                    <h1> Jedidiah </h1>
-                    <p> Wins: 45 </p>
+                    <h1> {{i.1}} </h1>
+                    <p> Wins: {{i.2}} Losses: {{i.3}} </p>
 
                 </div>
             </span>
-
-            <div class = "card-wrapper">
-                <div class="user-card">
-                    <div class="float-right">
-                        <img src="../static/avatar/022-man.png" alt="">
-                    </div>
-                    <h1> Tirzah </h1>
-                    <p> Wins: 3 </p>
-
-
-                </div>
-            </div>
         </div>
+        {% endfor %}
 
         <!--===== MAIN JS =====-->
         <script src="../static/scripts/admin.js"></script>

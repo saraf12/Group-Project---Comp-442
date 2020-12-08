@@ -165,6 +165,9 @@ def post_register():
     if valid and len(data['password']) < 8:
         valid = False
         flash("password must be at least 8 characters")
+    if valid and len(data['username']) < 8:
+        valid = False
+        flash("username must be at least 8 characters")
     if valid and data['password'] != data['confirm-password']:
         valid = False
         flash("password and confirm password must match")
