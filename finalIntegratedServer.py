@@ -345,6 +345,14 @@ def profile_page():
         flash("Please sign in")
         return redirect(url_for("get_signin"))
 
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
     profileData = dict()
@@ -427,6 +435,15 @@ def updaterecord():
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     game = request.form['game']
     matchId = request.form['matchId']
     name = "result" + str(matchId)
@@ -494,6 +511,15 @@ def get_edit_profile_page():
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
     profileData = dict()
@@ -509,6 +535,15 @@ def post_edit_profile_page():
     curr_uid = session.get("uid")
     regdb = get_db()
     c = get_db().cursor()
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     data = dict()
     fields = ['username', 'name', 'email', 'password', 'confirm-password', 'Iprofile']
     for field in fields:
@@ -548,6 +583,15 @@ def get_matchup_window(gametype):
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
     currUserData = dict()
@@ -585,6 +629,15 @@ def post_matchup_window_accept():
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
     currentUsername = request.form.get('current-username')
@@ -628,6 +681,15 @@ def get_inbox():
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+    
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
 
@@ -660,6 +722,15 @@ def post_inbox():
     if curr_uid == "":
         flash("Please sign in")
         return redirect(url_for("get_signin"))
+
+    try:
+        exp = datetime.strptime(session.get("expires"), "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        exp = None
+    if curr_uid is None or exp is None or exp < datetime.utcnow():
+        flash("Session has expired. Please sign in again.")
+        return redirect(url_for("get_signin"))
+
     regdb = get_db()
     c = get_db().cursor()
 
