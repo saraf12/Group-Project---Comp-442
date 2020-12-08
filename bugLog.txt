@@ -10,7 +10,9 @@ Bug: Unless a color is explicitly selected, the profile icon is changed to black
 Bug: Leaderboard doesn't show the correct info. Resolved. High Priority. Date reported: 11/29/20. Submitted by Tirzah Lloyd.
 Bug: Opponent data in matchup window is currently hard coded and not actually picking an opponent. Resolved. High Priority. Date reported: 11/29/20. Submitted by Tirzah Lloyd.
 
-
 Bug: UpdateRecord Button on profile page has to be clicked twice before showing the records. Resolved. Medium priority. Submitted by Tirzah Lloyd.
-Bug: Records was showed only for the first game in the profile page. Resolved. Submitted by Sydnee Charles.
-Bug: Inbox was only showing a maximum of one sent request. Resolved. High priority. Date reported: 12/8/20. Submitted by Tirzah Lloyd 
+Bug: Records was showed only for the first game in the profile page. Resolved. High Priority. Submitted by Sydnee Charles.
+Bug: On the admin page click the create game button with an empty input  would crash the server. Resolved. High Priority. Submitted by Sydnee Charles.
+Bug: Couldn't sign into the admin pages. Resolved. High Priority. Submitted by Tirzah Lloyd.
+Bug: Performance rating didn't work for new user. Resolved. High Priority. Submitted by Tirzah Lloyd.
+Bug: Adding to losses increases performance rating instead of decreasing it. Resolved. Medium Priority. Submitted by Tirzah Lloyd.
