@@ -1,14 +1,11 @@
 window.addEventListener("DOMContentLoaded", function() {
     let recordBtn = document.getElementsByClassName("recordBtn");
 
-    // let submitBtn = document.getElementsByName("submitRecord");
     var len = recordBtn.length;
     for(var i = 0; i < len; i++){
       recordBtn[i].addEventListener("click", showRecord);
     }
     
-    // let iconBtn = document.getElementById("profileIcons");
-    // iconBtn.addEventListener("click", editProfile);
 });
 
 function showRecord(){
@@ -22,33 +19,6 @@ function showRecord(){
     table.style.display = "";
   }
 }
-
-// function submitRecord(){
-//     //What do we want the submit button to do
-//     //this.disabled = true;
-//     name = "result" + this.id;
-//     let radioBtn = document.getElementsByName(name);
-//     var len = radioBtn.length;
-//     var x = 0;
-//     for(var i = 0; i < len; i++){
-//         if(radioBtn[i].checked == true){
-//             x = 1;
-//         }
-//     }
-//     if(x == 1){
-//         this.display = "none";
-//         for(var e = 0; e < len; e++){
-//             radioBtn[e].disabled = true;
-//         }
-//     }
-        
-
-// }
-
-// function editProfile(){
-//     let newWin = window.open("../templates/mainPage.html", "hello", "width=200,height=200");
-//     //newWin.document.write("Hello, world!");
-// }
 
 function gamesTab(evt, games){
     var i, tabcontent, tablinks;
