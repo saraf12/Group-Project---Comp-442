@@ -17,7 +17,7 @@ How to run website:
     -set FLASK_APP=integratedServer.py
     -python -m flask run
 
-Software to install:
+Software to install to be able to run the program:
         -flask
         -flask_mail
         -passlib

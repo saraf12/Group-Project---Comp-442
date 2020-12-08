@@ -9,3 +9,7 @@ Bug: Unless a color is explicitly selected, the profile icon is changed to black
 
 Bug: Leaderboard doesn't show the correct info. Closed. High Priority. Date reported: 11/29/20. Submitted by Tirzah Lloyd.
 Bug: Opponent data in matchup window is currently hard coded and not actually picking an opponent. Closed. High Priority. Date reported: 11/29/20. Submitted by Tirzah Lloyd.
+
+
+Bug: UpdateRecord Button on profile page has to be clicked twice before showing the records. Resolved. Medium priority. Submitted by Tirzah Lloyd.
+Bug: Records was showed only for the first game in the profile page. Resolved. Submitted by Sydnee Charles.
