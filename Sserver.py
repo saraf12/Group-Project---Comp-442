@@ -744,8 +744,6 @@ def get_admin_dashboard():
         conflictedList[g] = conflicList
     #############################
 
-    stats = dict()
-    
 
     return render_template("SydAdminDash.html", Users=Users, Matches=Matches, games=games, conflict= conflictedList)
 
