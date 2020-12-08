@@ -28,6 +28,7 @@ th{
 .sideBar{
     background-color: #24abbd;
     padding-top: 5%;
+    width: 18%;
 }
 
 .tab{    
@@ -38,4 +39,8 @@ th{
 
 header{
     text-align: right;
+}
+
+.mainBody{
+    width: 82%;
 }
